@@ -43,40 +43,7 @@ function Register() {
   return (
     <div className="registration-main" style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', gap: 0 }}>
       <div style={{ display: 'flex', boxShadow: '0 8px 32px rgba(44, 62, 80, 0.15)', borderRadius: 16, overflow: 'hidden', width: '1100px', minHeight: '700px', background: 'transparent' }}>
-        <div className="registration-left" style={{
-          background: 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)',
-          color: '#fff',
-          borderRadius: '0',
-          padding: '64px 48px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          minWidth: '400px',
-          maxWidth: '520px',
-          marginRight: 0,
-          height: '100%',
-          justifyContent: 'center',
-          flex: 1
-        }}>
-          <h1 style={{ fontSize: '3rem', fontWeight: 'bold', marginBottom: 18 }}>StudyFlow</h1>
-          <p style={{ fontSize: '1.3rem', marginBottom: 32 }}>
-            {t('registrationDesc')}
-          </p>
-          <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQV8-SeHf5btg5fnASeUJHPBO0NHJwZdfhytjQcoFi9aFpCG5dVZldpSLw&s"
-            alt={t('computerEducation')}
-            style={{ width: '98%', margin: '32px 0', borderRadius: '16px', background: '#fff', padding: 16 }}
-          />
-          <div className="features-list" style={{ marginTop: 24 }}>
-            <p style={{ fontWeight: 'bold', fontSize: '1.2rem', marginBottom: 12 }}>{t('newToStudyFlow')}</p>
-            <ul style={{ paddingLeft: 28, fontSize: '1.1rem', lineHeight: 1.8 }}>
-              <li>{t('createPersonalizedSchedules')}</li>
-              <li>{t('trackAssignmentsDeadlines')}</li>
-              <li>{t('connectWithClassmates')}</li>
-              <li>{t('accessCourseMaterials')}</li>
-            </ul>
-          </div>
-        </div>
+        {/* Left panel removed for debugging overlay issue */}
         <div className="registration-card" style={{ borderRadius: 0, marginLeft: 0, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <h2>{t('signUp')}</h2>
           <form onSubmit={handleSubmit} autoComplete="off">
