@@ -869,9 +869,9 @@ body.theme-dark .settings-bg {
   color: #23283a;
 }
 .theme-dark .quick-btn {
-  background: #23244a;
-  color: #b3b8d1;
-  border: 2px solid #6a11cb;
+  background: #23283a !important;
+  color: #f7f8fa !important;
+  border: 2px solid #444 !important;
 }
 .theme-dark .quick-btn.selected, .theme-dark .quick-btn:active {
   background: #6a11cb;
@@ -881,6 +881,35 @@ body.theme-dark .settings-bg {
 .theme-dark .quick-btn:not(:disabled):hover {
   background: #3a3f6a;
   color: #fff;
+}
+.theme-dark .quick-btn .quick-btn-label {
+  color: #f7f8fa !important;
+}
+body.theme-dark .subject-card .subject-details,
+body.theme-dark .subject-card .subject-major,
+body.theme-dark .subject-card .subject-year {
+  color: #e3e0ff !important;
+}
+body.theme-dark .main-btn-danger,
+body.theme-dark .main-btn {
+  background: linear-gradient(90deg, #ff512f 0%, #dd2476 100%) !important;
+  color: #fff !important;
+  border: none !important;
+}
+body.theme-dark .main-btn {
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%) !important;
+}
+body.theme-dark .main-btn-secondary {
+  background: #444 !important;
+  color: #fff !important;
+  border: none !important;
+}
+body.theme-dark .section-title,
+body.theme-dark .page-title {
+  color: #e3e0ff !important;
+}
+body.theme-dark .card-empty {
+  color: #b3b8d1 !important;
 }
 
 .count-badge {
