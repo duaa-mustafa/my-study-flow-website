@@ -43,11 +43,11 @@ export default function Assignments() {
     setAdding(true);
     setError('');
     try {
-      const res = await fetch('http://localhost:5000/assignments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ ...newAssignment, status: 'Incomplete' }),
-      });
+    const res = await fetch('http://localhost:5000/assignments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ ...newAssignment, status: 'Incomplete' }),
+    });
       if (!res.ok) {
         if (res.status === 403) {
           setError(t('assignmentAddForbidden'));
@@ -57,7 +57,7 @@ export default function Assignments() {
         setAdding(false);
         return;
       }
-      const data = await res.json();
+    const data = await res.json();
       setAssignments([...assignments, data]);
       setNewAssignment({ title: '', subject: '', due: '', priority: 'Medium' });
     } catch (err) {

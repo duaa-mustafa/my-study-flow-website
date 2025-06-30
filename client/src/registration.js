@@ -81,10 +81,8 @@ function Register() {
           <h2>{t('signUp')}</h2>
           <form onSubmit={handleSubmit} autoComplete="off">
             <input name="fullName" placeholder={t('fullName')} value={form.fullName} onChange={handleChange} required autoComplete="nope-fullname" />
-            <input name="email" type="email" placeholder={t('email')} value={form.email} onChange={handleChange} required autoComplete="nope-email" />
-            {/* Hidden dummy password field to absorb browser autofill */}
-            <input type="password" style={{ display: 'none' }} autoComplete="new-password" />
-            <input name="password" type="password" placeholder={t('password')} value={form.password} onChange={handleChange} required autoComplete="nope-password" />
+            <input name="email" type="email" placeholder={t('email')} value={form.email} onChange={handleChange} required autoComplete="email" />
+            <input name="password" type="password" placeholder={t('password')} value={form.password} onChange={handleChange} required autoComplete="new-password" />
             <input name="academicYear" placeholder={t('academicYear')} value={form.academicYear} onChange={handleChange} required autoComplete="nope-academic" />
             <input name="major" placeholder={t('major')} value={form.major} onChange={handleChange} required autoComplete="nope-major" />
             <button type="submit">{t('register')}</button>

@@ -3,20 +3,20 @@ import { useSettings } from './SettingsContext';
 
 export default function Help() {
   const { t } = useSettings();
-  const faqs = [
-    {
+const faqs = [
+  {
       q: t('faqAddSubjectQ'),
       a: t('faqAddSubjectA')
-    },
-    {
+  },
+  {
       q: t('faqScheduleTaskQ'),
       a: t('faqScheduleTaskA')
-    },
-    {
+  },
+  {
       q: t('faqUpdateProgressQ'),
       a: t('faqUpdateProgressA')
-    },
-    {
+  },
+  {
       q: t('faqMobileQ'),
       a: t('faqMobileA')
     }

@@ -26,7 +26,7 @@ export default function Rewards() {
       <div className="card">
         <h2 className="page-title">{t('rewardsStreakSystem')}</h2>
         <div className="section-title">{t('trackProgressEarnRewards')}</div>
-        <div style={{ display: 'flex', gap: 24, marginBottom: 32, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 24, marginBottom: 32, flexWrap: 'wrap' }}>
           <div className="reward-card reward-xp">
             <div className="section-title">{t('level')} {level}: {t('knowledgeSeeker')}</div>
             <div className="xp-value">{xp.toLocaleString()} XP</div>
@@ -40,7 +40,7 @@ export default function Rewards() {
             <div className="section-title">{t('currentStreak')}</div>
             <div className="streak-value">{streak} {t('days')}</div>
             <div className="on-fire">{t('youreOnFire')}</div>
-          </div>
+        </div>
           <div className="reward-card reward-badges">
             <div className="section-title">{t('badgesEarned')}</div>
             <div className="badges-list">{badges.map(b => <span key={b.label} title={t(b.label.toLowerCase().replace(/ /g, ''))} className="badge-icon">{b.icon}</span>)}</div>
