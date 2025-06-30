@@ -41,10 +41,58 @@ function Register() {
   };
 
   return (
-    <div className="registration-main" style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', gap: 0 }}>
-      <div style={{ display: 'flex', boxShadow: '0 8px 32px rgba(44, 62, 80, 0.15)', borderRadius: 16, overflow: 'hidden', width: '1100px', minHeight: '700px', background: 'transparent' }}>
-        {/* Left panel removed for debugging overlay issue */}
-        <div className="registration-card" style={{ borderRadius: 0, marginLeft: 0, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+    <div className="registration-main" style={{
+      display: 'flex',
+      minHeight: '100vh',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'inherit'
+    }}>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'row',
+        boxShadow: '0 8px 32px rgba(44, 62, 80, 0.15)',
+        borderRadius: 16,
+        overflow: 'hidden',
+        width: '900px',
+        minHeight: '600px',
+        background: 'transparent'
+      }}>
+        <div className="registration-left" style={{
+          background: 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)',
+          color: '#fff',
+          padding: '48px 32px',
+          width: '350px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          justifyContent: 'center'
+        }}>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: 18 }}>StudyFlow</h1>
+          <p style={{ fontSize: '1.1rem', marginBottom: 24 }}>{t('registrationDesc')}</p>
+          <img
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQV8-SeHf5btg5fnASeUJHPBO0NHJwZdfhytjQcoFi9aFpCG5dVZldpSLw&s"
+            alt={t('computerEducation')}
+            style={{ width: '100%', margin: '24px 0', borderRadius: '12px', background: '#fff', padding: 10 }}
+          />
+          <div className="features-list" style={{ marginTop: 16 }}>
+            <p style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: 10 }}>{t('newToStudyFlow')}</p>
+            <ul style={{ paddingLeft: 20, fontSize: '1rem', lineHeight: 1.7 }}>
+              <li>{t('createPersonalizedSchedules')}</li>
+              <li>{t('trackAssignmentsDeadlines')}</li>
+              <li>{t('connectWithClassmates')}</li>
+              <li>{t('accessCourseMaterials')}</li>
+            </ul>
+          </div>
+        </div>
+        <div className="registration-card" style={{
+          borderRadius: 0,
+          marginLeft: 0,
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center'
+        }}>
           <h2>{t('signUp')}</h2>
           <form onSubmit={handleSubmit} autoComplete="off">
             <input name="fullName" placeholder={t('fullName')} value={form.fullName} onChange={handleChange} required autoComplete="nope-fullname" />
