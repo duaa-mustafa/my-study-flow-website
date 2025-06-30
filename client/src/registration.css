@@ -15,6 +15,7 @@
   align-items: flex-start;
   min-width: 350px;
   max-width: 450px;
+  pointer-events: none !important;
 }
 
 .registration-left h1 {
@@ -49,6 +50,7 @@
   margin-left: 40px;
   z-index: 10 !important;
   position: relative !important;
+  pointer-events: auto !important;
 }
 
 .registration-card h2 {
