@@ -10,6 +10,4 @@ const Availability = sequelize.define('Availability', {
   best: { type: DataTypes.BOOLEAN, defaultValue: false },
 });
 
-Availability.sync();
-
-module.exports = Availability; 
+module.exports = Availability;

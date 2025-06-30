@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useSettings } from './SettingsContext';
 
 const DEFAULT_WORK_MIN = 25;
 const DEFAULT_BREAK_MIN = 5;
@@ -11,6 +12,7 @@ function playSound() {
 }
 
 export default function FocusMode() {
+  const { t } = useSettings();
   const [minutes, setMinutes] = useState(DEFAULT_WORK_MIN);
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -191,12 +193,12 @@ export default function FocusMode() {
   };
 
   return (
-    <div className="card focus-card" style={{ maxWidth: 600, margin: '40px auto', borderRadius: 24, padding: 40, textAlign: 'center', boxShadow: '0 8px 32px #6a11cb22', background: 'linear-gradient(135deg, #f3eaff 0%, #e3e0ff 100%)' }}>
-      <h2 className="page-title" style={{ marginBottom: 30, fontSize: 28, fontWeight: 'bold' }}>🎯 Focus Mode: Pomodoro Timer</h2>
+    <div id="main-content" className="card focus-card" style={{ maxWidth: 600, margin: '40px auto', borderRadius: 24, padding: 40, textAlign: 'center', boxShadow: '0 8px 32px #6a11cb22', background: 'linear-gradient(135deg, #f3eaff 0%, #e3e0ff 100%)' }}>
+      <h2 className="page-title" style={{ marginBottom: 30, fontSize: 28, fontWeight: 'bold', color: '#6a11cb' }}>{t('focusMode')}</h2>
       <div className="count-badge" style={{ display: 'inline-block', background: 'linear-gradient(90deg, #6a11cb 0%, #43e97b 100%)', color: '#fff', borderRadius: 16, padding: '6px 22px', fontWeight: 'bold', fontSize: 18, marginBottom: 18, boxShadow: '0 2px 8px #b3b8d1' }}>
-        Session {cycle}
+        {t('session')} {cycle}
       </div>
-      <div className="focus-section-title" style={{ color: '#2575fc', fontWeight: 'bold', fontSize: 18, margin: '18px 0 8px 0' }}>Quick Duration:</div>
+      <div className="focus-section-title" style={{ color: '#2575fc', fontWeight: 'bold', fontSize: 18, margin: '18px 0 8px 0' }}>{t('quickDuration')}</div>
       <div style={{ marginBottom: 24 }}>
         {[25, 30, 45, 60, 90, 120].map((min) => (
           <button
@@ -205,7 +207,7 @@ export default function FocusMode() {
             onClick={() => handleCustomDuration(min)}
             style={{ opacity: 1, marginRight: 8, marginBottom: 8 }}
           >
-            {min}min
+            {min}{t('min')}
           </button>
         ))}
       </div>
@@ -221,24 +223,24 @@ export default function FocusMode() {
       </div>
       {/* Control Buttons */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: 15, marginBottom: 25 }}>
-        <button className="main-btn" onClick={handleStart} disabled={isRunning} style={{ cursor: isRunning ? 'not-allowed' : 'pointer' }}>▶️ Start</button>
-        <button className="main-btn-secondary" onClick={handlePause} disabled={!isRunning} style={{ cursor: !isRunning ? 'not-allowed' : 'pointer' }}>⏸️ Pause</button>
-        <button className="main-btn-danger" onClick={handleReset}>🔄 Reset</button>
-        <button className="main-btn" onClick={handleStartBreak} style={{ background: '#43e97b', color: '#fff' }}>☕ Break</button>
+        <button className="main-btn" onClick={handleStart} disabled={isRunning} style={{ cursor: isRunning ? 'not-allowed' : 'pointer' }}>{t('start')}</button>
+        <button className="main-btn-secondary" onClick={handlePause} disabled={!isRunning} style={{ cursor: !isRunning ? 'not-allowed' : 'pointer' }}>{t('pause')}</button>
+        <button className="main-btn-danger" onClick={handleReset}>{t('reset')}</button>
+        <button className="main-btn" onClick={handleStartBreak} style={{ background: '#43e97b', color: '#fff' }}>{t('break')}</button>
       </div>
       <div className="count-badge" style={{ display: 'inline-block', background: 'linear-gradient(90deg, #43e97b 0%, #6a11cb 100%)', color: '#fff', borderRadius: 16, padding: '6px 22px', fontWeight: 'bold', fontSize: 16, marginBottom: 18, marginTop: 8, boxShadow: '0 2px 8px #b3b8d1' }}>
-        Completed Sessions: {completed}
+        {t('completedSessions')}: {completed}
       </div>
       {/* Notification Permission */}
       <div style={{ margin: '18px 0' }}>
-        <button onClick={requestNotificationPermission} className="main-btn-secondary" style={{ fontSize: 14, padding: '8px 18px' }}>🔔 Enable Notifications</button>
+        <button onClick={requestNotificationPermission} className="main-btn-secondary" style={{ fontSize: 14, padding: '8px 18px' }}>{t('enableNotifications')}</button>
       </div>
-      <div className="focus-section-title" style={{ color: '#2575fc', fontWeight: 'bold', fontSize: 18, margin: '18px 0 8px 0' }}>How Pomodoro Works:</div>
+      <div className="focus-section-title" style={{ color: '#2575fc', fontWeight: 'bold', fontSize: 18, margin: '18px 0 8px 0' }}>{t('howPomodoroWorks')}</div>
       <div style={{ background: '#f3eaff', borderRadius: 15, padding: 20, fontSize: 15, textAlign: 'left', color: '#23283a', boxShadow: '0 2px 8px #e3e0ff' }}>
-        <b>1.</b> Work for your chosen duration (25min default).<br />
-        <b>2.</b> Take a 5-minute break.<br />
-        <b>3.</b> After 4 sessions, take a longer 15-minute break.<br />
-        <b>4.</b> Repeat and stay focused! 🎯
+        <b>1.</b> {t('workForDuration')}<br />
+        <b>2.</b> {t('takeShortBreak')}<br />
+        <b>3.</b> {t('afterSessionsLongBreak')}<br />
+        <b>4.</b> {t('repeatStayFocused')}
       </div>
     </div>
   );

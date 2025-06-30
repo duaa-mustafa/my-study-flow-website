@@ -1,31 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUserCircle, FaBell, FaSync, FaPalette, FaLock, FaTrash, FaLanguage, FaEye, FaUser, FaEnvelope, FaPhone, FaCalendar, FaUniversity, FaBook, FaIdBadge } from 'react-icons/fa';
+import { FaUserCircle, FaBell, FaSync, FaPalette, FaLock, FaTrash, FaLanguage, FaEye, FaUser } from 'react-icons/fa';
 import './App.css';
-
-const TABS = [
-  { label: 'Personal', key: 'personal', icon: <FaUserCircle /> },
-  { label: 'Notify', key: 'notifications', icon: <FaBell /> },
-  { label: 'Sync', key: 'sync', icon: <FaSync /> },
-  { label: 'Theme', key: 'appearance', icon: <FaPalette /> },
-  { label: 'Privacy', key: 'privacy', icon: <FaLock /> },
-  { label: 'Account', key: 'account', icon: <FaTrash /> },
-];
+import { useSettings } from './SettingsContext';
 
 const defaultProfile = {
-  firstName: '', lastName: '', email: '', phone: '', dob: '', timezone: '', bio: '', institution: '', major: '', gradYear: '', studentId: ''
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  dob: '',
+  timezone: '',
+  institution: '',
+  major: '',
+  gradYear: '',
+  studentId: '',
+  bio: ''
 };
-const defaultNotif = { deadline: true, missed: true, motivational: true };
+const defaultNotif = {
+  deadline: true,
+  missed: true,
+  motivational: true
+};
 
 export default function Settings() {
+  const { language, setLanguage, fontSize, setFontSize, contrast, setContrast, t } = useSettings();
+
+  const TABS = [
+    { label: t('personal'), key: 'personal', icon: <FaUserCircle /> },
+    { label: t('notify'), key: 'notifications', icon: <FaBell /> },
+    { label: t('sync'), key: 'sync', icon: <FaSync /> },
+    { label: t('theme'), key: 'appearance', icon: <FaPalette /> },
+    { label: t('privacy'), key: 'privacy', icon: <FaLock /> },
+    { label: t('account'), key: 'account', icon: <FaTrash /> },
+  ];
+
   const [tab, setTab] = useState('personal');
   const [profile, setProfile] = useState(() => JSON.parse(localStorage.getItem('profile')) || defaultProfile);
   const [notif, setNotif] = useState(() => JSON.parse(localStorage.getItem('notif')) || defaultNotif);
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
   const [profilePic, setProfilePic] = useState(() => localStorage.getItem('profilePic') || null);
-  const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
-  const [fontSize, setFontSize] = useState(() => localStorage.getItem('fontSize') || 'medium');
-  const [contrast, setContrast] = useState(() => localStorage.getItem('contrast') || 'normal');
   const [syncStatus, setSyncStatus] = useState('Last synced: just now');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const navigate = useNavigate();
@@ -35,9 +49,6 @@ export default function Settings() {
   useEffect(() => { localStorage.setItem('notif', JSON.stringify(notif)); }, [notif]);
   useEffect(() => { localStorage.setItem('theme', theme); }, [theme]);
   useEffect(() => { localStorage.setItem('profilePic', profilePic); }, [profilePic]);
-  useEffect(() => { localStorage.setItem('language', language); }, [language]);
-  useEffect(() => { localStorage.setItem('fontSize', fontSize); }, [fontSize]);
-  useEffect(() => { localStorage.setItem('contrast', contrast); }, [contrast]);
 
   useEffect(() => {
     let applied = theme;
@@ -48,6 +59,16 @@ export default function Settings() {
     document.body.classList.remove('theme-light', 'theme-dark');
     document.body.classList.add(`theme-${applied}`);
   }, [theme]);
+
+  useEffect(() => {
+    document.body.classList.remove('font-small', 'font-medium', 'font-large');
+    document.body.classList.add(`font-${fontSize}`);
+  }, [fontSize]);
+
+  useEffect(() => {
+    document.body.classList.remove('high-contrast');
+    if (contrast === 'high') document.body.classList.add('high-contrast');
+  }, [contrast]);
 
   const handleSignOut = () => {
     localStorage.removeItem('token');
@@ -87,8 +108,8 @@ export default function Settings() {
     <div className="settings-bg">
       {/* Small Settings Title Top Left */}
       <div className="settings-header-row">
-        <span className="settings-title-small">Settings</span>
-        <span className="settings-header-desc">Personalize your StudyFlow experience</span>
+        <span className="settings-title-small">{t('settings')}</span>
+        <span className="settings-header-desc">{t('personalize')}</span>
       </div>
       {/* Tabs */}
       <div className="settings-tabs">
@@ -124,54 +145,54 @@ export default function Settings() {
                   <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleProfilePicChange} />
                 </label>
               </div>
-              <div className="settings-profile-upload-hint">Upload your picture here</div>
+              <div className="settings-profile-upload-hint">{t('uploadPic')}</div>
             </div>
             {/* Right: Fields in grid */}
             <div className="settings-fields-grid">
               <div className="settings-fields-row">
-                <label>First Name
-                  <input className="settings-input" placeholder="First Name" value={profile.firstName} onChange={e => handleProfileChange('firstName', e.target.value)} />
+                <label>{t('firstName')}
+                  <input className="settings-input" placeholder={t('firstName')} value={profile.firstName} onChange={e => handleProfileChange('firstName', e.target.value)} />
                 </label>
-                <label>Last Name
-                  <input className="settings-input" placeholder="Last Name" value={profile.lastName} onChange={e => handleProfileChange('lastName', e.target.value)} />
-                </label>
-              </div>
-              <div className="settings-fields-row">
-                <label>Email
-                  <input className="settings-input" placeholder="Email" value={profile.email} onChange={e => handleProfileChange('email', e.target.value)} />
-                </label>
-                <label>Phone
-                  <input className="settings-input" placeholder="Phone" value={profile.phone} onChange={e => handleProfileChange('phone', e.target.value)} />
+                <label>{t('lastName')}
+                  <input className="settings-input" placeholder={t('lastName')} value={profile.lastName} onChange={e => handleProfileChange('lastName', e.target.value)} />
                 </label>
               </div>
               <div className="settings-fields-row">
-                <label>Date of Birth
-                  <input className="settings-input" type="date" placeholder="Date of Birth" value={profile.dob} onChange={e => handleProfileChange('dob', e.target.value)} />
+                <label>{t('email')}
+                  <input className="settings-input" placeholder={t('email')} value={profile.email} onChange={e => handleProfileChange('email', e.target.value)} />
                 </label>
-                <label>Timezone
-                  <input className="settings-input" placeholder="Timezone" value={profile.timezone} onChange={e => handleProfileChange('timezone', e.target.value)} />
-                </label>
-              </div>
-              <div className="settings-fields-row">
-                <label>Institution
-                  <input className="settings-input" placeholder="Institution" value={profile.institution} onChange={e => handleProfileChange('institution', e.target.value)} />
-                </label>
-                <label>Major
-                  <input className="settings-input" placeholder="Major" value={profile.major} onChange={e => handleProfileChange('major', e.target.value)} />
+                <label>{t('phone')}
+                  <input className="settings-input" placeholder={t('phone')} value={profile.phone} onChange={e => handleProfileChange('phone', e.target.value)} />
                 </label>
               </div>
               <div className="settings-fields-row">
-                <label>Graduation Year
-                  <input className="settings-input" placeholder="Graduation Year" value={profile.gradYear} onChange={e => handleProfileChange('gradYear', e.target.value)} />
+                <label>{t('dob')}
+                  <input className="settings-input" type="date" placeholder={t('dob')} value={profile.dob} onChange={e => handleProfileChange('dob', e.target.value)} />
                 </label>
-                <label>Student ID
-                  <input className="settings-input" placeholder="Student ID" value={profile.studentId} onChange={e => handleProfileChange('studentId', e.target.value)} />
+                <label>{t('timezone')}
+                  <input className="settings-input" placeholder={t('timezone')} value={profile.timezone} onChange={e => handleProfileChange('timezone', e.target.value)} />
+                </label>
+              </div>
+              <div className="settings-fields-row">
+                <label>{t('institution')}
+                  <input className="settings-input" placeholder={t('institution')} value={profile.institution} onChange={e => handleProfileChange('institution', e.target.value)} />
+                </label>
+                <label>{t('major')}
+                  <input className="settings-input" placeholder={t('major')} value={profile.major} onChange={e => handleProfileChange('major', e.target.value)} />
+                </label>
+              </div>
+              <div className="settings-fields-row">
+                <label>{t('gradYear')}
+                  <input className="settings-input" placeholder={t('gradYear')} value={profile.gradYear} onChange={e => handleProfileChange('gradYear', e.target.value)} />
+                </label>
+                <label>{t('studentId')}
+                  <input className="settings-input" placeholder={t('studentId')} value={profile.studentId} onChange={e => handleProfileChange('studentId', e.target.value)} />
                 </label>
               </div>
               {/* Bio full width */}
               <div className="settings-fields-row settings-fields-row-full">
-                <label style={{ width: '100%' }}>Bio
-                  <textarea className="settings-textarea" placeholder="Bio" value={profile.bio} onChange={e => handleProfileChange('bio', e.target.value)} />
+                <label style={{ width: '100%' }}>{t('bio')}
+                  <textarea className="settings-textarea" placeholder={t('bio')} value={profile.bio} onChange={e => handleProfileChange('bio', e.target.value)} />
                 </label>
               </div>
             </div>
@@ -180,58 +201,59 @@ export default function Settings() {
         {/* Notifications Tab */}
         {tab === 'notifications' && (
           <div>
-            <div className="settings-section-title"><FaBell /> Notifications</div>
+            <div className="settings-section-title"><FaBell /> {t('notifications')}</div>
             <div className="settings-switch-list">
-              <label><input type="checkbox" checked={notif.deadline} onChange={() => handleNotifChange('deadline')} /> Deadline Notifications</label>
-              <label><input type="checkbox" checked={notif.missed} onChange={() => handleNotifChange('missed')} /> Missed Task Alerts</label>
-              <label><input type="checkbox" checked={notif.motivational} onChange={() => handleNotifChange('motivational')} /> Motivational Messages</label>
+              <label><input type="checkbox" checked={notif.deadline} onChange={() => handleNotifChange('deadline')} /> {t('deadlineNotif')}</label>
+              <label><input type="checkbox" checked={notif.missed} onChange={() => handleNotifChange('missed')} /> {t('missedTask')}</label>
+              <label><input type="checkbox" checked={notif.motivational} onChange={() => handleNotifChange('motivational')} /> {t('motivational')}</label>
             </div>
           </div>
         )}
         {/* Sync Tab */}
         {tab === 'sync' && (
           <div>
-            <div className="settings-section-title"><FaSync /> Sync</div>
-            <button className="settings-btn-main" onClick={handleManualSync}>Manual Sync</button>
-            <div className="settings-sync-status">{syncStatus}</div>
+            <div className="settings-section-title"><FaSync /> {t('sync')}</div>
+            <button className="settings-btn-main" onClick={handleManualSync}>{t('syncBtn')}</button>
+            <div className="settings-sync-status">{t('lastSynced')}: {syncStatus}</div>
           </div>
         )}
         {/* Appearance Tab */}
         {tab === 'appearance' && (
           <div>
-            <div className="settings-section-title"><FaPalette /> Theme</div>
+            <div className="settings-section-title"><FaPalette /> {t('themeTab')}</div>
             <div className="settings-radio-list">
-              <label><input type="radio" name="theme" checked={theme === 'light'} onChange={() => setTheme('light')} /> Light</label>
-              <label><input type="radio" name="theme" checked={theme === 'dark'} onChange={() => setTheme('dark')} /> Dark</label>
-              <label><input type="radio" name="theme" checked={theme === 'system'} onChange={() => setTheme('system')} /> System</label>
+              <label><input type="radio" name="theme" checked={theme === 'light'} onChange={() => setTheme('light')} /> {t('light')}</label>
+              <label><input type="radio" name="theme" checked={theme === 'dark'} onChange={() => setTheme('dark')} /> {t('dark')}</label>
+              <label><input type="radio" name="theme" checked={theme === 'system'} onChange={() => setTheme('system')} /> {t('system')}</label>
             </div>
-            <div className="settings-section-title" style={{ marginTop: 18 }}><FaEye /> Accessibility</div>
+            <div className="settings-section-title" style={{ marginTop: 18 }}><FaEye /> {t('accessibility')}</div>
             <div className="settings-radio-list">
-              <label>Font Size: <select className="settings-select" value={fontSize} onChange={e => setFontSize(e.target.value)}><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option></select></label>
-              <label>Contrast: <select className="settings-select" value={contrast} onChange={e => setContrast(e.target.value)}><option value="normal">Normal</option><option value="high">High</option></select></label>
+              <label>{t('fontSize')}: <select className="settings-select" value={fontSize} onChange={e => setFontSize(e.target.value)}><option value="small">{t('small')}</option><option value="medium">{t('medium')}</option><option value="large">{t('large')}</option></select></label>
+              <label>{t('contrast')}: <select className="settings-select" value={contrast} onChange={e => setContrast(e.target.value)}><option value="normal">{t('normal')}</option><option value="high">{t('high')}</option></select></label>
             </div>
-            <div className="settings-section-title" style={{ marginTop: 18 }}><FaLanguage /> Language</div>
-            <select className="settings-select" value={language} onChange={e => setLanguage(e.target.value)}><option value="en">English</option><option value="ar">Arabic</option><option value="fr">French</option><option value="es">Spanish</option></select>
+            <div className="settings-section-title" style={{ marginTop: 18 }}><FaLanguage /> {t('language')}</div>
+            <select className="settings-select" value={language} onChange={e => setLanguage(e.target.value)}><option value="en">English</option><option value="ar">العربية</option></select>
           </div>
         )}
         {/* Privacy & Security Tab */}
         {tab === 'privacy' && (
           <div>
-            <div className="settings-section-title"><FaLock /> Privacy</div>
-            <button className="settings-btn-main" onClick={handleChangePassword}><FaLock style={{ marginRight: 8 }} />Change Password</button>
+            <div className="settings-section-title"><FaLock /> {t('privacyTab')}</div>
+            <button className="settings-btn-main" onClick={handleChangePassword}><FaLock style={{ marginRight: 8 }} />{t('changePassword')}</button>
           </div>
         )}
         {/* Account Tab */}
         {tab === 'account' && (
           <div>
-            <div className="settings-section-title"><FaTrash /> Account</div>
-            <button className="settings-btn-danger" onClick={() => setShowDeleteConfirm(true)}><FaTrash style={{ marginRight: 8 }} /> Delete Account</button>
-            <button className="settings-btn-secondary" onClick={handleSignOut}>Sign Out</button>
+            <div className="settings-section-title"><FaTrash /> {t('accountTab')}</div>
+            <button className="settings-btn-danger" onClick={() => setShowDeleteConfirm(true)}><FaTrash style={{ marginRight: 8 }} /> {t('deleteAccount')}</button>
+            <button className="settings-btn-secondary" onClick={handleSignOut}>{t('signOut')}</button>
             {showDeleteConfirm && (
               <div className="settings-delete-confirm">
-                Are you sure you want to delete your account? This action cannot be undone.<br /><br />
-                <button className="settings-btn-danger" onClick={handleDeleteAccount}>Yes, Delete</button>
-                <button className="settings-btn-secondary" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+                {t('deleteConfirm')}
+                <br /><br />
+                <button className="settings-btn-danger" onClick={handleDeleteAccount}>{t('yesDelete')}</button>
+                <button className="settings-btn-secondary" onClick={() => setShowDeleteConfirm(false)}>{t('cancel')}</button>
               </div>
             )}
           </div>

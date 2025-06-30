@@ -1174,3 +1174,554 @@ body.theme-dark .settings-textarea:focus {
   margin-top: 10px;
   text-align: center;
 }
+
+/* Refined font size classes */
+.font-small { font-size: 14px; }
+.font-medium { font-size: 16px; }
+.font-large { font-size: 18px; }
+
+.font-small .page-title { font-size: 1.3rem; font-weight: bold; }
+.font-medium .page-title { font-size: 1.6rem; font-weight: bold; }
+.font-large .page-title { font-size: 2rem; font-weight: bold; }
+
+.font-small .section-title { font-size: 1.1rem; font-weight: 600; }
+.font-medium .section-title { font-size: 1.2rem; font-weight: 600; }
+.font-large .section-title { font-size: 1.4rem; font-weight: 600; }
+
+.font-small .sidebar-user, .font-small .sidebar-user-role, .font-small .sidebar-link { font-size: 0.95rem; }
+.font-medium .sidebar-user, .font-medium .sidebar-user-role, .font-medium .sidebar-link { font-size: 1.05rem; }
+.font-large .sidebar-user, .font-large .sidebar-user-role, .font-large .sidebar-link { font-size: 1.15rem; }
+
+.font-small input, .font-small select, .font-small label, .font-small p { font-size: 0.95rem; }
+.font-medium input, .font-medium select, .font-medium label, .font-medium p { font-size: 1.05rem; }
+.font-large input, .font-large select, .font-large label, .font-large p { font-size: 1.18rem; }
+
+.font-small .main-btn, .font-small .main-btn-secondary, .font-small .main-btn-disabled { font-size: 0.95rem; }
+.font-medium .main-btn, .font-medium .main-btn-secondary, .font-medium .main-btn-disabled { font-size: 1.05rem; }
+.font-large .main-btn, .font-large .main-btn-secondary, .font-large .main-btn-disabled { font-size: 1.18rem; }
+
+/* High contrast mode - refined */
+.high-contrast, .high-contrast .card, .high-contrast input, .high-contrast select, .high-contrast label, .high-contrast p {
+  background: #fff !important;
+  color: #000 !important;
+  border-color: #000 !important;
+}
+.high-contrast .main-btn, .high-contrast .main-btn-secondary {
+  background: #000 !important;
+  color: #fff !important;
+  border: 2px solid #000 !important;
+}
+.high-contrast .main-btn-disabled {
+  background: #ccc !important;
+  color: #000 !important;
+  border: 2px solid #000 !important;
+}
+.high-contrast .page-title, .high-contrast .section-title {
+  color: #000 !important;
+}
+.high-contrast .sidebar-link, .high-contrast .sidebar-user, .high-contrast .sidebar-user-role {
+  color: #000 !important;
+}
+
+/* Remove excessive boldness and size from headings and sidebar */
+.page-title, .section-title, .sidebar-user, .sidebar-user-role, .sidebar-link {
+  font-weight: inherit;
+}
+
+/* Ensure links and icons are visible in high contrast */
+.high-contrast a, .high-contrast .icon, .high-contrast svg {
+  color: #000 !important;
+  fill: #000 !important;
+}
+
+/* Skip to content link styles */
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 10px;
+  background: #ff0;
+  color: #000;
+  padding: 8px 16px;
+  z-index: 1000;
+  font-weight: bold;
+  border-radius: 6px;
+  transition: left 0.2s;
+}
+.skip-link:focus {
+  left: 10px;
+}
+
+/* Card styles */
+.card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px #e3e0ff;
+  padding-block: 32px;
+  padding-inline: 32px;
+  margin-block-end: 24px;
+  margin-inline: 0;
+  direction: unset;
+}
+.assignment-item {
+  border-inline-start: 8px solid #ffb74d;
+  margin-block-end: 16px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px #e3e0ff;
+  padding-block: 32px;
+  padding-inline: 32px;
+}
+.progress-item {
+  background: #fafbfc;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px #e3e0ff;
+  padding-block: 28px;
+  padding-inline: 28px;
+  margin-block-end: 16px;
+}
+.card-empty {
+  color: #888;
+  font-style: italic;
+  font-size: 1.1rem;
+  margin-block: 40px;
+  text-align: center;
+}
+
+/* Button styles */
+.main-btn {
+  background: linear-gradient(90deg, #667eea 0%, #2575fc 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #e3e0ff;
+  margin-right: 8px;
+  transition: background 0.2s;
+}
+.main-btn-secondary {
+  background: #bdbdbd;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #e3e0ff;
+  margin-right: 8px;
+}
+.main-btn-danger {
+  background: linear-gradient(90deg, #ff512f 0%, #dd2476 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #ffd200;
+}
+.main-btn-disabled {
+  background: #ccc;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: not-allowed;
+  box-shadow: 0 2px 8px #e3e0ff;
+}
+
+/* Status and priority badges */
+.badge-priority-high {
+  background: #e57373;
+  color: #fff;
+  border-radius: 8px;
+  padding: 4px 14px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  margin-right: 8px;
+  display: inline-block;
+}
+.badge-priority-medium {
+  background: #ffb74d;
+  color: #fff;
+  border-radius: 8px;
+  padding: 4px 14px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  margin-right: 8px;
+  display: inline-block;
+}
+.badge-priority-low {
+  background: #81c784;
+  color: #fff;
+  border-radius: 8px;
+  padding: 4px 14px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  margin-right: 8px;
+  display: inline-block;
+}
+.badge-status-complete {
+  background: #90caf9;
+  color: #fff;
+  border-radius: 8px;
+  padding: 4px 14px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  margin-right: 8px;
+  display: inline-block;
+}
+.badge-status-incomplete {
+  background: #bdbdbd;
+  color: #fff;
+  border-radius: 8px;
+  padding: 4px 14px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  margin-right: 8px;
+  display: inline-block;
+}
+
+/* Ensure compatibility with font size and contrast classes */
+.font-small .main-btn, .font-small .main-btn-secondary, .font-small .main-btn-danger, .font-small .main-btn-disabled {
+  font-size: 0.95rem;
+}
+.font-medium .main-btn, .font-medium .main-btn-secondary, .font-medium .main-btn-danger, .font-medium .main-btn-disabled {
+  font-size: 1.05rem;
+}
+.font-large .main-btn, .font-large .main-btn-secondary, .font-large .main-btn-danger, .font-large .main-btn-disabled {
+  font-size: 1.18rem;
+}
+
+/* Consistent font family for both LTR and RTL */
+body, .card, .sidebar-link, .page-title, .section-title {
+  font-family: 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'Arial', 'sans-serif', 'Cairo', 'Noto Sans Arabic';
+}
+
+/* Logical direction for cards and containers */
+.card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px #e3e0ff;
+  padding-block: 32px;
+  padding-inline: 32px;
+  margin-block-end: 24px;
+  margin-inline: 0;
+  direction: unset;
+}
+
+.assignment-item {
+  border-inline-start: 8px solid #ffb74d;
+  margin-block-end: 16px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px #e3e0ff;
+  padding-block: 32px;
+  padding-inline: 32px;
+}
+
+.progress-item {
+  background: #fafbfc;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px #e3e0ff;
+  padding-block: 28px;
+  padding-inline: 28px;
+  margin-block-end: 16px;
+}
+
+.card-empty {
+  color: #888;
+  font-style: italic;
+  font-size: 1.1rem;
+  margin-block: 40px;
+  text-align: center;
+}
+
+/* Headings and section titles */
+.page-title {
+  color: #6a11cb;
+  font-weight: bold;
+  text-align: start;
+  margin-block-end: 24px;
+  margin-block-start: 0;
+  margin-inline: 0;
+}
+.section-title {
+  color: #2575fc;
+  font-weight: 600;
+  text-align: start;
+  margin-block-end: 12px;
+  margin-block-start: 0;
+  margin-inline: 0;
+}
+
+/* Sidebar styles */
+.sidebar-link, .sidebar-user, .sidebar-user-role {
+  color: #222;
+  text-align: start;
+  margin-inline: 0;
+  font-weight: 500;
+}
+.sidebar-link.active, .sidebar-link:focus {
+  color: #6a11cb;
+  background: #f3eaff;
+  border-radius: 8px;
+}
+
+/* Logical margin/padding for RTL/LTR */
+[dir="rtl"] .card, [dir="rtl"] .assignment-item, [dir="rtl"] .progress-item {
+  text-align: start;
+}
+[dir="rtl"] .page-title, [dir="rtl"] .section-title, [dir="rtl"] .sidebar-link, [dir="rtl"] .sidebar-user, [dir="rtl"] .sidebar-user-role {
+  text-align: start;
+}
+
+[dir="ltr"] .card, [dir="ltr"] .assignment-item, [dir="ltr"] .progress-item {
+  text-align: start;
+}
+[dir="ltr"] .page-title, [dir="ltr"] .section-title, [dir="ltr"] .sidebar-link, [dir="ltr"] .sidebar-user, [dir="ltr"] .sidebar-user-role {
+  text-align: start;
+}
+
+/* Ensure all cards, headings, and sidebar items look the same in both directions */
+
+/* Reward cards layout */
+.reward-card {
+  background: #f7f8fa;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #e3e0ff;
+  padding: 24px;
+  margin: 0 0 18px 0;
+  min-width: 180px;
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.reward-xp {
+  background: #f3eaff;
+  flex: 2;
+  min-width: 220px;
+}
+.reward-streak, .reward-badges {
+  background: #f7f8fa;
+}
+.reward-login-streak {
+  background: #fff;
+  margin-top: 18px;
+}
+
+.xp-bar-bg {
+  width: 100%;
+  background: #fff;
+  border-radius: 8px;
+  height: 14px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.xp-bar {
+  height: 14px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+  transition: width 0.3s;
+}
+
+.badges-list {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.badge-icon {
+  font-size: 28px;
+  background: #fff;
+  border-radius: 50%;
+  padding: 8px;
+  box-shadow: 0 1px 4px #e3e0ff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.streak-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: #6a11cb;
+  margin-bottom: 8px;
+}
+.on-fire {
+  color: #888;
+  font-size: 14px;
+}
+.login-streak-list {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+  justify-content: center;
+}
+.login-streak-day {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #43e97b;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+}
+.login-streak-day:not(:first-child) {
+  background: #eee;
+  color: #aaa;
+}
+
+/* Unscheduled tasks sidebar redesign */
+.calendar-sidebar {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px #e3e0ff;
+  padding: 24px 18px;
+  margin-bottom: 24px;
+  min-width: 300px;
+}
+.unscheduled-task-card {
+  background: #fafbfc;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px #e3e0ff;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  border-left: 6px solid #ffb74d;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.unscheduled-task-title {
+  font-weight: bold;
+  color: #2575fc;
+  font-size: 1.08rem;
+  margin-bottom: 2px;
+}
+.unscheduled-task-priority-high {
+  background: #e57373;
+  color: #fff;
+  border-radius: 8px;
+  padding: 2px 10px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  display: inline-block;
+  margin-top: 2px;
+}
+.unscheduled-task-priority-medium {
+  background: #ffb74d;
+  color: #fff;
+  border-radius: 8px;
+  padding: 2px 10px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  display: inline-block;
+  margin-top: 2px;
+}
+.unscheduled-task-priority-low {
+  background: #81c784;
+  color: #fff;
+  border-radius: 8px;
+  padding: 2px 10px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+/* Progress page new card design */
+.progress-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 32px;
+  margin-top: 24px;
+}
+.progress-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px #e3e0ff;
+  padding: 28px 32px 22px 32px;
+  position: relative;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: box-shadow 0.2s;
+}
+.progress-card-top {
+  height: 7px;
+  width: 100%;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 18px;
+}
+.progress-card .section-title {
+  font-weight: bold;
+  color: #222;
+  font-size: 1.18rem;
+  margin-bottom: 10px;
+  text-align: start;
+}
+.progress-bar-main {
+  width: 100%;
+  height: 16px;
+  border-radius: 8px;
+  background: #ececec;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.progress-bar-main-fill {
+  height: 100%;
+  border-radius: 8px;
+  transition: width 0.4s cubic-bezier(.4,2,.6,1);
+}
+.progress-value {
+  font-size: 1.08rem;
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #6a11cb;
+}
+.progress-card input[type="range"] {
+  width: 100%;
+  accent-color: #2575fc;
+  margin-top: 4px;
+}
+@media (max-width: 800px) {
+  .progress-grid {
+    grid-template-columns: 1fr;
+  }
+  .progress-card {
+    padding: 20px 12px 16px 12px;
+  }
+}
+
+.overall-progress-value {
+  font-size: 2.1rem;
+  font-weight: bold;
+  color: #6a11cb;
+  margin-bottom: 6px;
+}
+.overall-progress-bar-bg {
+  background: #ececec;
+  border-radius: 8px;
+  height: 16px;
+  width: 70%;
+  margin: 0 auto 18px auto;
+  overflow: hidden;
+  position: relative;
+}
+.overall-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+  border-radius: 8px;
+  transition: width 0.4s cubic-bezier(.4,2,.6,1);
+}

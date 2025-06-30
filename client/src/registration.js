@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './registration.css';
+import { useSettings } from './SettingsContext';
 
 function Register() {
   const [form, setForm] = useState({
@@ -12,6 +13,7 @@ function Register() {
   });
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  const { t } = useSettings();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -58,40 +60,38 @@ function Register() {
         }}>
           <h1 style={{ fontSize: '3rem', fontWeight: 'bold', marginBottom: 18 }}>StudyFlow</h1>
           <p style={{ fontSize: '1.3rem', marginBottom: 32 }}>
-            Your complete academic companion. <b>Plan</b>, track, and excel in your studies.
+            {t('registrationDesc')}
           </p>
-          {/* Provided Image */}
           <img
             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQV8-SeHf5btg5fnASeUJHPBO0NHJwZdfhytjQcoFi9aFpCG5dVZldpSLw&s"
-            alt="Computer Education"
+            alt={t('computerEducation')}
             style={{ width: '98%', margin: '32px 0', borderRadius: '16px', background: '#fff', padding: 16 }}
           />
           <div className="features-list" style={{ marginTop: 24 }}>
-            <p style={{ fontWeight: 'bold', fontSize: '1.2rem', marginBottom: 12 }}>New to StudyFlow? Sign up to:</p>
+            <p style={{ fontWeight: 'bold', fontSize: '1.2rem', marginBottom: 12 }}>{t('newToStudyFlow')}</p>
             <ul style={{ paddingLeft: 28, fontSize: '1.1rem', lineHeight: 1.8 }}>
-              <li>Create personalized study schedules</li>
-              <li>Track assignments and deadlines</li>
-              <li>Connect with classmates</li>
-              <li>Access course materials</li>
+              <li>{t('createPersonalizedSchedules')}</li>
+              <li>{t('trackAssignmentsDeadlines')}</li>
+              <li>{t('connectWithClassmates')}</li>
+              <li>{t('accessCourseMaterials')}</li>
             </ul>
           </div>
         </div>
         <div className="registration-card" style={{ borderRadius: 0, marginLeft: 0, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <h2>Sign Up</h2>
+          <h2>{t('signUp')}</h2>
           <form onSubmit={handleSubmit} autoComplete="off">
-            <input name="fullName" placeholder="Full Name" value={form.fullName} onChange={handleChange} required autoComplete="nope-fullname" />
-            <input name="userEmail" type="email" placeholder="Email" value={form.email} onChange={handleChange} required autoComplete="nope-email" />
+            <input name="fullName" placeholder={t('fullName')} value={form.fullName} onChange={handleChange} required autoComplete="nope-fullname" />
+            <input name="email" type="email" placeholder={t('email')} value={form.email} onChange={handleChange} required autoComplete="nope-email" />
             {/* Hidden dummy password field to absorb browser autofill */}
             <input type="password" style={{ display: 'none' }} autoComplete="new-password" />
-            <input name="newUserPassword" type="password" placeholder="Password" value={form.password} onChange={handleChange} required autoComplete="nope-password" />
-            <input name="userAcademicYear" placeholder="Academic Year" value={form.academicYear} onChange={handleChange} required autoComplete="nope-academic" />
-            <input name="userMajor" placeholder="Major" value={form.major} onChange={handleChange} required autoComplete="nope-major" />
-            <button type="submit">Register</button>
+            <input name="password" type="password" placeholder={t('password')} value={form.password} onChange={handleChange} required autoComplete="nope-password" />
+            <input name="academicYear" placeholder={t('academicYear')} value={form.academicYear} onChange={handleChange} required autoComplete="nope-academic" />
+            <input name="major" placeholder={t('major')} value={form.major} onChange={handleChange} required autoComplete="nope-major" />
+            <button type="submit">{t('register')}</button>
           </form>
-          {message && <div className="message" style={{ color: message.includes('success') ? 'green' : 'red' }}>{message}</div>}
-          {/* Link to Login */}
+          {message && <div className="message" style={{ color: message.includes('success') ? 'green' : 'red' }}>{t(message)}</div>}
           <div style={{ marginTop: 16 }}>
-            Already have an account? <span style={{ color: '#6a11cb', cursor: 'pointer' }} onClick={() => navigate('/login')}>Log In</span>
+            {t('alreadyHaveAccount')} <span style={{ color: '#6a11cb', cursor: 'pointer' }} onClick={() => navigate('/login')}>{t('logIn')}</span>
           </div>
         </div>
       </div>

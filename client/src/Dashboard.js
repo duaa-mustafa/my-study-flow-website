@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useSettings } from './SettingsContext';
 
 // Mock API functions
 const fetchTasks = () => new Promise(resolve => setTimeout(() => resolve([
@@ -20,18 +21,6 @@ const fetchDeadlines = () => new Promise(resolve => setTimeout(() => resolve([
   { name: 'Software Engineering Project', date: 'Friday, 2:00 PM', color: '#6a11cb' },
 ]), 800));
 
-const aiMessagesInit = [
-  { from: 'ai', text: 'Hi! I am StudyFlow\'s AI Assistant. I can help you with your computer science studies, including:\n• Network concepts and protocols\n• Database design and SQL queries\n• Operating System topics\n• Software Engineering methodologies\nWhat can I help you with today?' },
-  { from: 'user', text: 'I\'m having trouble understanding database normalization. Can you help?' },
-  { from: 'ai', text: 'Database normalization can be tricky! It is a process of organizing a database to reduce redundancy and improve data integrity. Let me break it down...\nFirst Normal Form (1NF):\nEach table must contain a single value, and each record needs to be unique. No repeating groups of columns.\nSecond Normal Form (2NF):\nThe table must be in 1NF, and all non-key attributes must depend on the entire primary key.\nThird Normal Form (3NF):\nThe table must be in 2NF, and all attributes must depend directly on the primary key, not on other non-key attributes.\nBoyce-Codd Normal Form (BCNF):\nA stricter version of 3NF that addresses certain anomalies not handled by 3NF.\nWould you like me to provide a specific example of normalizing a database table?' },
-];
-const suggestedQuestions = [
-  'Explain TCP/IP model',
-  'SQL join types',
-  'Process scheduling in OS',
-  'Agile vs Waterfall',
-];
-
 function countTasksDone(assignments) {
   const safeAssignments = Array.isArray(assignments) ? assignments : [];
   return safeAssignments.filter(a => a.status === 'Complete').length;
@@ -48,11 +37,16 @@ function countDeadlines(assignments) {
 }
 
 export default function Dashboard() {
+  const { t, fontSize, contrast, language } = useSettings();
   const [tasks, setTasks] = useState(null);
   const [subjectProgress, setSubjectProgress] = useState(null);
   const [deadlines, setDeadlines] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [chat, setChat] = useState(aiMessagesInit);
+  const [chat, setChat] = useState([
+    { from: 'ai', text: t('aiWelcome') },
+    { from: 'user', text: t('aiSampleQ') },
+    { from: 'ai', text: t('aiNormExplain') },
+  ]);
   const [input, setInput] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
@@ -67,10 +61,10 @@ export default function Dashboard() {
 
   // Mock data for beautiful widgets
   const quickActions = [
-    { icon: '🎯', label: 'Start Focus Session', route: '/focus', color: '#667eea' },
-    { icon: '📅', label: 'Set Availability', route: '/set-availability', color: '#43e97b' },
-    { icon: '📚', label: 'View Subjects', route: '/subjects', color: '#f093fb' },
-    { icon: '📝', label: 'Add Assignment', route: '/assignments', color: '#4facfe' }
+    { icon: '🎯', label: t('startFocusSession'), route: '/focus', color: '#667eea' },
+    { icon: '📅', label: t('setAvailability'), route: '/set-availability', color: '#43e97b' },
+    { icon: '📚', label: t('viewSubjects'), route: '/subjects', color: '#f093fb' },
+    { icon: '📝', label: t('addAssignment'), route: '/assignments', color: '#4facfe' }
   ];
 
   const recentTasks = [
@@ -146,17 +140,22 @@ export default function Dashboard() {
     }, 1000);
   };
 
-  if (loading) return <div style={{ textAlign: 'center', marginTop: 80, fontSize: 22, color: '#6a11cb' }}>Loading dashboard...</div>;
+  if (loading) return <div style={{ textAlign: 'center', marginTop: 80, fontSize: 22, color: '#6a11cb' }}>{t('loadingDashboard') || 'Loading dashboard...'}</div>;
 
   return (
-    <div style={{ padding: '32px', minHeight: '100vh' }}>
+    <div
+      id="main-content"
+      className={`dashboard-container font-${fontSize} ${contrast === 'high' ? 'high-contrast' : ''}`}
+      style={{ padding: '32px', minHeight: '100vh' }}
+      lang={language}
+    >
       {/* Welcome Header */}
       <div className="card" style={{ borderRadius: 20, padding: '32px', marginBottom: '32px' }}>
         <h1 className="page-title" style={{ fontSize: '2.5rem', marginBottom: '8px', fontWeight: 'bold' }}>
-          Welcome back! 👋
+          {t('welcomeBack') || 'Welcome back!'} 👋
         </h1>
         <p style={{ fontSize: '1.1rem', opacity: 0.9 }}>
-          Ready to crush your study goals today?
+          {t('readyToCrush') || 'Ready to crush your study goals today?'}
         </p>
       </div>
 
@@ -180,8 +179,8 @@ export default function Dashboard() {
           justifyContent: 'center',
         }}>
           <div style={{ fontSize: '2.5rem', color: '#667eea', marginBottom: 8 }}>⏰</div>
-          <div style={{ color: '#666', fontSize: '1.1rem', marginBottom: 4 }}>Study Hours</div>
-          <div style={{ fontSize: '2.2rem', fontWeight: 'bold', color: '#667eea' }}>{stats.studyHours} hrs</div>
+          <div style={{ color: '#666', fontSize: '1.1rem', marginBottom: 4 }}>{t('studyHours') || 'Study Hours'}</div>
+          <div style={{ fontSize: '2.2rem', fontWeight: 'bold', color: '#667eea' }}>{stats.studyHours} {t('hours') || 'hrs'}</div>
         </div>
         {/* Tasks Done - visually enhanced */}
         <div style={{
@@ -197,7 +196,7 @@ export default function Dashboard() {
           minHeight: 160,
         }}>
           <div style={{ fontSize: '3rem', marginBottom: 8, color: '#43e97b', background: '#fff', borderRadius: '50%', boxShadow: '0 2px 12px #43e97b22', padding: 12, display: 'inline-block' }}>✅</div>
-          <div style={{ color: '#43e97b', fontWeight: 'bold', fontSize: '1.2rem', marginBottom: 4 }}>Tasks Done</div>
+          <div style={{ color: '#43e97b', fontWeight: 'bold', fontSize: '1.2rem', marginBottom: 4 }}>{t('tasksDone') || 'Tasks Done'}</div>
           <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#43e97b' }}>{stats.tasksCompleted}</div>
         </div>
         {/* Streak */}
@@ -213,8 +212,8 @@ export default function Dashboard() {
           justifyContent: 'center',
         }}>
           <div style={{ fontSize: '2.5rem', color: '#f093fb', marginBottom: 8 }}>🔥</div>
-          <div style={{ color: '#f093fb', fontWeight: 'bold', fontSize: '1.1rem', marginBottom: 4 }}>Streak</div>
-          <div style={{ fontSize: '2.2rem', fontWeight: 'bold', color: '#f093fb' }}>{stats.streakDays} days</div>
+          <div style={{ color: '#f093fb', fontWeight: 'bold', fontSize: '1.1rem', marginBottom: 4 }}>{t('streak')}</div>
+          <div style={{ fontSize: '2.2rem', fontWeight: 'bold', color: '#f093fb' }}>{stats.streakDays} {t('days')}</div>
         </div>
         {/* Deadlines */}
         <div style={{
@@ -229,7 +228,7 @@ export default function Dashboard() {
           justifyContent: 'center',
         }}>
           <div style={{ fontSize: '2.5rem', color: '#4facfe', marginBottom: 8 }}>📅</div>
-          <div style={{ color: '#4facfe', fontWeight: 'bold', fontSize: '1.1rem', marginBottom: 4 }}>Deadlines</div>
+          <div style={{ color: '#4facfe', fontWeight: 'bold', fontSize: '1.1rem', marginBottom: 4 }}>{t('deadlines')}</div>
           <div style={{ fontSize: '2.2rem', fontWeight: 'bold', color: '#4facfe' }}>{stats.upcomingDeadlines}</div>
         </div>
       </div>
@@ -237,7 +236,7 @@ export default function Dashboard() {
       {/* Quick Actions */}
       <div style={{ marginBottom: '32px' }}>
         <h2 style={{ fontSize: '1.5rem', marginBottom: '20px', color: '#333', fontWeight: 'bold' }}>
-          Quick Actions 🚀
+          {t('quickActions')} 🚀
         </h2>
         <div style={{ 
           display: 'grid', 
@@ -279,7 +278,7 @@ export default function Dashboard() {
           boxShadow: '0 4px 20px rgba(0,0,0,0.08)' 
         }}>
           <h3 style={{ fontSize: '1.3rem', marginBottom: '20px', color: '#333', fontWeight: 'bold' }}>
-            📋 Recent Tasks
+            📋 {t('recentTasks')}
           </h3>
           <div>
             {recentTasks.map((task, i) => (
@@ -294,7 +293,7 @@ export default function Dashboard() {
               }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 'bold', color: '#333' }}>{task.title}</div>
-                  <div style={{ fontSize: '0.9rem', color: '#666' }}>{task.subject} • Due {task.due}</div>
+                  <div style={{ fontSize: '0.9rem', color: '#666' }}>{task.subject} • {t('due')} {t(task.due.toLowerCase())}</div>
                 </div>
                 <div style={{
                   padding: '4px 8px',
@@ -304,7 +303,7 @@ export default function Dashboard() {
                   background: task.priority === 'high' ? '#ff6b6b20' : task.priority === 'medium' ? '#ffd93d20' : '#6bcf7f20',
                   color: task.priority === 'high' ? '#ff6b6b' : task.priority === 'medium' ? '#e67700' : '#6bcf7f'
                 }}>
-                  {task.priority}
+                  {t(task.priority)}
                 </div>
               </div>
             ))}
@@ -322,7 +321,7 @@ export default function Dashboard() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
             <div style={{ fontSize: '1.5rem', marginRight: '12px' }}>🤖</div>
-            <h3 style={{ fontSize: '1.3rem', color: '#333', fontWeight: 'bold' }}>AI Assistant</h3>
+            <h3 style={{ fontSize: '1.3rem', color: '#333', fontWeight: 'bold' }}>{t('aiAssistant')}</h3>
           </div>
           
           <div style={{ 
@@ -355,7 +354,7 @@ export default function Dashboard() {
             ))}
             {aiLoading && (
               <div style={{ color: '#667eea', fontSize: '0.9rem', margin: '8px 0' }}>
-                AI is typing...
+                {t('aiTyping')}
               </div>
             )}
           </div>
@@ -366,7 +365,7 @@ export default function Dashboard() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder="Ask me anything..."
+              placeholder={t('askMeAnything')}
               style={{
                 flex: 1,
                 padding: '12px',
@@ -387,7 +386,7 @@ export default function Dashboard() {
                 cursor: 'pointer'
               }}
             >
-              Send
+              {t('send')}
             </button>
           </div>
         </div>

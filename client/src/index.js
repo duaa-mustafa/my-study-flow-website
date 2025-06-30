@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+import WrappedApp from './App';
 import reportWebVitals from './reportWebVitals';
 import { AssignmentsProvider } from './AssignmentsContext';
 
@@ -9,7 +9,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <AssignmentsProvider>
-    <App />
+      <WrappedApp />
     </AssignmentsProvider>
   </React.StrictMode>
 );

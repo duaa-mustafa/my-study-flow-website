@@ -1,19 +1,12 @@
 import React, { useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import './registration.css';
+import { useSettings } from './SettingsContext';
 
 const SIDEBAR_WIDTH = 180;
 
-const topNavItems = [
-  { label: 'Dashboard', route: '/dashboard' },
-  { label: 'Assignments', route: '/assignments' },
-  { label: 'Import from Moodle', route: '/import' },
-  { label: 'Analytics/Grade', route: '/analytics' },
-  { label: 'Rewards and Streak', route: '/rewards' },
-  { label: 'Focus Mode', route: '/focus' },
-];
-
 export default function Layout() {
+  const { t } = useSettings();
   const location = useLocation();
   const theme = localStorage.getItem('theme') || 'light';
   let applied = theme;
@@ -22,25 +15,33 @@ export default function Layout() {
     applied = prefersDark ? 'dark' : 'light';
   }
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const topNavItems = [
+    { label: t('dashboard'), route: '/dashboard' },
+    { label: t('assignments'), route: '/assignments' },
+    { label: t('importFromMoodle'), route: '/import' },
+    { label: t('analyticsGrade'), route: '/analytics' },
+    { label: t('rewardsAndStreak'), route: '/rewards' },
+    { label: t('focusMode'), route: '/focus' },
+  ];
   const sidebarIcons = [
-    { icon: '📚', label: 'Subjects', route: '/subjects' },
-    { icon: '📅', label: 'Calendar', route: '/calendar' },
-    { icon: '📈', label: 'Progress', route: '/progress' },
-    { icon: '⏰', label: 'Set Availability', route: '/set-availability' },
-    { icon: '🎯', label: 'Focus Mode', route: '/focus' },
-    { icon: '❓', label: 'Help', route: '/help' },
+    { icon: '📚', label: t('subjects'), route: '/subjects' },
+    { icon: '📅', label: t('calendar'), route: '/calendar' },
+    { icon: '📈', label: t('progress'), route: '/progress' },
+    { icon: '⏰', label: t('setAvailability'), route: '/set-availability' },
+    { icon: '🎯', label: t('focusMode'), route: '/focus' },
+    { icon: '❓', label: t('help'), route: '/help' },
   ];
   return (
-    <div className={`theme-${applied}`} style={{ display: 'flex', minHeight: '100vh' }}>
+    <div id="main-content" className={`theme-${applied}`} style={{ display: 'flex', minHeight: '100vh' }}>
       {/* Sidebar */}
       <div style={{ width: sidebarOpen ? 180 : 60, background: '#2d2f4a', color: '#fff', display: 'flex', flexDirection: 'column', padding: 0, position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 100, transition: 'width 0.2s' }}>
         {sidebarOpen ? (
           <div style={{ padding: 20, height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 28 }}>
-              <button onClick={() => setSidebarOpen(false)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 28, cursor: 'pointer', marginRight: 8 }}>
+              <button onClick={() => setSidebarOpen(false)} className="sidebar-close-btn">
                 ←
               </button>
-              <h2 style={{ fontWeight: 'bold', letterSpacing: 1, fontSize: 22, margin: 0 }}>StudyFlow</h2>
+              <h2 className="page-title">StudyFlow</h2>
             </div>
             <nav style={{ flex: 1 }}>
               {sidebarIcons.map((item) => (
@@ -69,9 +70,9 @@ export default function Layout() {
             </nav>
             <div style={{ marginTop: 24, display: 'flex', alignItems: 'center' }}>
               <img src={require('./logo.svg').default} alt="avatar" style={{ width: 32, height: 32, borderRadius: '50%', marginRight: 10, background: '#fff' }} />
-              <div>
-                <div style={{ fontWeight: 'bold', fontSize: 14 }}>User</div>
-                <div style={{ fontSize: 11, color: '#aaa' }}>Student</div>
+              <div className="sidebar-user">
+                <div className="section-title">{t('user')}</div>
+                <div className="sidebar-user-role">{t('student')}</div>
               </div>
             </div>
           </div>

@@ -1,11 +1,9 @@
-   const { Sequelize } = require('sequelize');
+const { Sequelize } = require('sequelize');
 
-   const sequelize = new Sequelize('studyflow', 'root', 'Duaa.mustafa1', {
-     host: 'localhost',
-     dialect: 'mysql',
-   });
+const sequelize = new Sequelize('studyflow', 'root', 'Duaa.mustafa1', {
+  host: 'localhost',
+  dialect: 'mysql',
+  logging: false, // optional: disable SQL logs
+});
 
-   // SQL to create the database for the library scenario
-   const createLibraryDB = `CREATE DATABASE IF NOT EXISTS library_system;`;
-
-   module.exports = sequelize;
+module.exports = sequelize;

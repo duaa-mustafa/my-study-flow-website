@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './registration.css';
+import { useSettings } from './SettingsContext';
 
 function Login() {
   const [form, setForm] = useState({
@@ -10,6 +11,7 @@ function Login() {
   });
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  const { t } = useSettings();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

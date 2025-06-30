@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useSettings } from './SettingsContext';
 
 export default function SetAvailability() {
+  const { t } = useSettings();
   const [slots, setSlots] = useState([]);
   const [form, setForm] = useState({ day: '', start: '', end: '', best: false });
   const [editing, setEditing] = useState(null);
@@ -33,34 +35,38 @@ export default function SetAvailability() {
     e.preventDefault();
     setError('');
     try {
-      if (editing !== null) {
-        const res = await fetch(`http://localhost:5000/availability/${slots[editing].id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify(form),
-        });
-        if (!res.ok) throw new Error('Update failed');
-        const updated = await res.json();
-        setSlots(slots.map((s, i) => (i === editing ? updated : s)));
-        setEditing(null);
-      } else {
-        const res = await fetch('http://localhost:5000/availability', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify(form),
-        });
-        if (!res.ok) throw new Error('Add failed');
-        const added = await res.json();
-        setSlots([...slots, added]);
-      }
+      const url = editing !== null
+        ? `http://localhost:5000/availability/${slots[editing].id}`
+        : 'http://localhost:5000/availability';
+
+      const method = editing !== null ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) throw new Error('Save failed');
+      const result = await res.json();
+
+      setSlots(editing !== null
+        ? slots.map((s, i) => (i === editing ? result : s))
+        : [...slots, result]);
+
       setForm({ day: '', start: '', end: '', best: false });
+      setEditing(null);
     } catch {
       setError('Failed to save.');
     }
   };
 
   const handleEdit = idx => {
-    setForm({ day: slots[idx].day, start: slots[idx].start, end: slots[idx].end, best: slots[idx].best });
+    const s = slots[idx];
+    setForm({ day: s.day, start: s.start, end: s.end, best: s.best });
     setEditing(idx);
   };
 
@@ -80,250 +86,125 @@ export default function SetAvailability() {
   };
 
   return (
-    <div style={{ padding: '32px', minHeight: '100vh' }}>
-      {/* Header */}
-      <div className="card" style={{ borderRadius: 20, padding: '32px', marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '2.5rem', marginBottom: '8px', fontWeight: 'bold' }}>
-          📅 Set Your Availability
-        </h1>
-        <p style={{ fontSize: '1.1rem', opacity: 0.9 }}>
-          Plan your study schedule and find your best focus times
-        </p>
-      </div>
+    <div id="main-content" style={{
+      maxWidth: 800,
+      margin: '40px auto',
+      borderRadius: 20,
+      padding: 36,
+      minHeight: 500,
+      background: 'linear-gradient(135deg, #f3eaff 0%, #e3e0ff 100%)',
+      boxShadow: '0 4px 32px #e3e0ff',
+    }}>
+      <h1 style={{ fontWeight: 'bold', fontSize: 32, color: '#6a11cb', marginBottom: 32 }}>{t('setAvailability')}</h1>
+      {error && <p style={{ color: '#e57373', fontWeight: 'bold', marginBottom: 18 }}>{t(error)}</p>}
+      <form onSubmit={handleSubmit} style={{
+        display: 'flex',
+        gap: 14,
+        marginBottom: 32,
+        alignItems: 'center',
+        background: '#fff',
+        borderRadius: 14,
+        boxShadow: '0 2px 8px #e3e0ff',
+        padding: 20,
+      }}>
+        <select name="day" value={form.day} onChange={handleChange} required style={{
+          flex: 1,
+          padding: 14,
+          borderRadius: 8,
+          border: '1px solid #ccc',
+          fontSize: 17,
+        }}>
+          <option value="">{t('selectDay')}</option>
+          {[t('monday'), t('tuesday'), t('wednesday'), t('thursday'), t('friday')].map((day, idx) => (
+            <option key={day} value={day}>{day}</option>
+          ))}
+        </select>
+        <input name="start" type="time" value={form.start} onChange={handleChange} required style={{
+          flex: 1,
+          padding: 14,
+          borderRadius: 8,
+          border: '1px solid #ccc',
+          fontSize: 17,
+        }} placeholder={t('startTime')} />
+        <input name="end" type="time" value={form.end} onChange={handleChange} required style={{
+          flex: 1,
+          padding: 14,
+          borderRadius: 8,
+          border: '1px solid #ccc',
+          fontSize: 17,
+        }} placeholder={t('endTime')} />
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 'bold', color: '#6a11cb' }}>
+          <input type="checkbox" name="best" checked={form.best} onChange={handleChange} style={{ accentColor: '#6a11cb' }} />
+          {t('best')}
+        </label>
+        <button type="submit" style={{
+          padding: '14px 28px',
+          fontWeight: 'bold',
+          fontSize: 17,
+          marginLeft: 8,
+          background: 'linear-gradient(90deg, #667eea 0%, #2575fc 100%)',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 8,
+          cursor: 'pointer',
+          boxShadow: '0 2px 8px #e3e0ff',
+          transition: 'background 0.2s',
+        }}>{editing !== null ? t('update') : t('add')}</button>
+      </form>
 
-      <div className="card" style={{ maxWidth: 800, margin: '0 auto', borderRadius: 20, padding: '40px', overflow: 'hidden' }}>
-        {/* Add/Edit Form */}
-        <div style={{ marginBottom: '40px' }}>
-          <h3 style={{ fontSize: '1.5rem', marginBottom: '20px', color: '#333', fontWeight: 'bold' }}>
-            {editing !== null ? '✏️ Edit Time Slot' : '➕ Add New Time Slot'}
-          </h3>
-          <form onSubmit={handleSubmit} style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-            gap: '16px',
-            alignItems: 'end'
-          }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>Day</label>
-              <select 
-                name="day" 
-                value={form.day} 
-                onChange={handleChange} 
-                required 
-                style={{ 
-                  width: '100%',
-                  padding: '12px',
-                  border: '2px solid #e9ecef',
-                  borderRadius: '12px',
-                  fontSize: '1rem',
-                  background: '#fff'
-                }}
-              >
-                <option value="">Select Day</option>
-                {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(d => 
-                  <option key={d} value={d}>{d}</option>
-                )}
-              </select>
-            </div>
-            
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>Start Time</label>
-              <input 
-                name="start" 
-                type="time" 
-                value={form.start} 
-                onChange={handleChange} 
-                required 
-                style={{ 
-                  width: '100%',
-                  padding: '12px',
-                  border: '2px solid #e9ecef',
-                  borderRadius: '12px',
-                  fontSize: '1rem'
-                }}
-              />
-            </div>
-            
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>End Time</label>
-              <input 
-                name="end" 
-                type="time" 
-                value={form.end} 
-                onChange={handleChange} 
-                required 
-                style={{ 
-                  width: '100%',
-                  padding: '12px',
-                  border: '2px solid #e9ecef',
-                  borderRadius: '12px',
-                  fontSize: '1rem'
-                }}
-              />
-            </div>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <input 
-                type="checkbox" 
-                name="best" 
-                checked={form.best} 
-                onChange={handleChange}
-                style={{ width: '18px', height: '18px' }}
-              />
-              <label style={{ fontWeight: 'bold', color: '#555' }}>Best time to study</label>
-            </div>
-            
-            <button 
-              type="submit" 
-              style={{ 
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                color: '#fff', 
-                border: 'none', 
-                borderRadius: '12px', 
-                padding: '14px 24px', 
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                fontSize: '1rem',
-                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
-                transition: 'transform 0.2s ease'
-              }}
-              onMouseEnter={e => e.target.style.transform = 'translateY(-2px)'}
-              onMouseLeave={e => e.target.style.transform = 'translateY(0)'}
-            >
-              {editing !== null ? '🔄 Update' : '➕ Add'}
-            </button>
-          </form>
-        </div>
-
-        {/* Error Message */}
-        {error && (
-          <div style={{ 
-            background: '#ff6b6b20', 
-            color: '#ff6b6b', 
-            padding: '12px', 
-            borderRadius: '8px', 
-            marginBottom: '20px',
-            border: '1px solid #ff6b6b30'
-          }}>
-            ⚠️ {error}
-          </div>
-        )}
-
-        {/* Loading State */}
-        {loading && (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-            <div style={{ fontSize: '2rem', marginBottom: '16px' }}>⏳</div>
-            Loading your availability...
-          </div>
-        )}
-
-        {/* Time Slots List */}
-        <div>
-          <h3 style={{ fontSize: '1.5rem', marginBottom: '20px', color: '#333', fontWeight: 'bold' }}>
-            📋 Your Time Slots ({slots.length})
-          </h3>
-          
-          {slots.length === 0 && !loading && (
-            <div style={{ 
-              textAlign: 'center', 
-              padding: '40px', 
-              color: '#666',
-              background: '#f8f9fa',
-              borderRadius: '12px',
-              border: '2px dashed #dee2e6'
-            }}>
-              <div style={{ fontSize: '3rem', marginBottom: '16px' }}>📅</div>
-              <div style={{ fontSize: '1.1rem', marginBottom: '8px' }}>No availability set yet</div>
-              <div style={{ fontSize: '0.9rem', color: '#888' }}>Add your first time slot above to get started!</div>
-            </div>
-          )}
-          
-          <div style={{ display: 'grid', gap: '12px' }}>
-            {slots.map((slot, i) => (
+      <div style={{ marginTop: 18 }}>
+        {loading ? (
+          <div style={{ textAlign: 'center', marginTop: 40, color: '#6a11cb', fontWeight: 'bold', fontSize: 22 }}>{t('loading')}</div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 24 }}>
+            {slots.length === 0 && <div style={{ color: '#888', fontSize: 20, fontStyle: 'italic' }}>{t('noAvailabilitySet')}</div>}
+        {slots.map((slot, i) => (
               <div key={slot.id} style={{
+                background: '#fff',
+                borderRadius: 18,
+                boxShadow: '0 2px 12px #e3e0ff',
+                padding: 24,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '16px',
-                padding: '16px',
-                background: slot.best ? 'linear-gradient(135deg, #43e97b20 0%, #38f9d720 100%)' : '#f8f9fa',
-                borderRadius: '12px',
-                border: `2px solid ${slot.best ? '#43e97b30' : '#e9ecef'}`,
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease'
-              }} onMouseEnter={e => {
-                e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
-              }} onMouseLeave={e => {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = 'none';
+                justifyContent: 'space-between',
+                borderLeft: slot.best ? '8px solid #6a11cb' : '8px solid #bdbdbd',
+                minHeight: 70,
+                marginBottom: 8,
+                position: 'relative',
               }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '8px',
-                    marginBottom: '4px'
-                  }}>
-                    <span style={{ fontSize: '1.2rem' }}>
-                      {slot.best ? '⭐' : '🕐'}
-                    </span>
-                    <span style={{ fontWeight: 'bold', color: '#333', fontSize: '1.1rem' }}>
-                      {slot.day}
-                    </span>
-                    {slot.best && (
-                      <span style={{
-                        background: '#43e97b',
-                        color: '#fff',
-                        padding: '2px 8px',
-                        borderRadius: '12px',
-                        fontSize: '0.8rem',
-                        fontWeight: 'bold'
-                      }}>
-                        BEST TIME
-                      </span>
-                    )}
-                  </div>
-                  <div style={{ color: '#666', fontSize: '1rem' }}>
-                    {slot.start} - {slot.end}
-                  </div>
+                <div>
+                  <div style={{ fontWeight: 'bold', fontSize: 22, color: '#222', marginBottom: 4 }}>{t(slot.day.toLowerCase())}</div>
+                  <div style={{ color: '#6a11cb', fontWeight: 'bold', fontSize: 17 }}>{slot.start} - {slot.end} {slot.best && <span style={{ color: '#ffb74d', marginLeft: 8 }}>★ {t('best')}</span>}</div>
                 </div>
-                
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button 
-                    onClick={() => handleEdit(i)} 
-                    style={{ 
-                      background: '#667eea20', 
-                      color: '#667eea', 
-                      border: 'none', 
-                      borderRadius: '8px', 
-                      padding: '8px 12px', 
-                      fontWeight: 'bold', 
-                      cursor: 'pointer',
-                      fontSize: '0.9rem'
-                    }}
-                  >
-                    ✏️ Edit
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(i)} 
-                    style={{ 
-                      background: '#ff6b6b20', 
-                      color: '#ff6b6b', 
-                      border: 'none', 
-                      borderRadius: '8px', 
-                      padding: '8px 12px', 
-                      fontWeight: 'bold', 
-                      cursor: 'pointer',
-                      fontSize: '0.9rem'
-                    }}
-                  >
-                    🗑️ Delete
-                  </button>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button onClick={() => handleEdit(i)} style={{
+                    background: 'linear-gradient(90deg, #ffd200 0%, #ff512f 100%)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '10px 22px',
+                    fontWeight: 'bold',
+                    fontSize: 16,
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px #e3e0ff',
+                  }}>{t('edit')}</button>
+                  <button onClick={() => handleDelete(i)} style={{
+                    background: 'linear-gradient(90deg, #ff512f 0%, #dd2476 100%)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '10px 22px',
+                    fontWeight: 'bold',
+                    fontSize: 16,
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px #ffd200',
+                  }}>{t('delete')}</button>
                 </div>
               </div>
-            ))}
+        ))}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
-} 
+}

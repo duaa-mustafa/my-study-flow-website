@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSettings } from './SettingsContext';
 
 const initialUnscheduledTasks = [
   { id: 1, name: 'Software Engineering Project', duration: '1 hour', priority: 'High' },
@@ -38,7 +39,7 @@ const initialScheduledTasks = [
   },
 ];
 
-const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const dates = [4, 5, 6, 7, 8, 9, 10];
 const times = [
   '8:00', '9:00', '10:00', '11:00', '12:00',
@@ -52,6 +53,7 @@ const priorityColors = {
 };
 
 function Calendar() {
+  const { t } = useSettings();
   const [unscheduledTasks, setUnscheduledTasks] = useState(initialUnscheduledTasks);
   const [scheduledTasks, setScheduledTasks] = useState(initialScheduledTasks);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -113,22 +115,22 @@ function Calendar() {
   };
 
   return (
-    <div style={{ minHeight: '100vh' }}>
+    <div id="main-content" style={{ minHeight: '100vh' }}>
       {/* Add Task Modal */}
       {showAddForm && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
           <form onSubmit={handleAddTask} style={{ background: '#fff', borderRadius: 12, padding: 32, minWidth: 320, boxShadow: '0 4px 24px rgba(44,62,80,0.15)' }}>
-            <h2 style={{ marginBottom: 18 }}>Add New Task</h2>
-            <input placeholder="Task Name" value={newTask.name} onChange={e => setNewTask({ ...newTask, name: e.target.value })} style={{ width: '100%', marginBottom: 12, padding: 8, borderRadius: 6, border: '1px solid #ccc' }} required />
-            <input placeholder="Duration (e.g. 1 hour, 30 minutes)" value={newTask.duration} onChange={e => setNewTask({ ...newTask, duration: e.target.value })} style={{ width: '100%', marginBottom: 12, padding: 8, borderRadius: 6, border: '1px solid #ccc' }} required />
+            <h2 style={{ marginBottom: 18 }}>{t('addNewTask')}</h2>
+            <input placeholder={t('taskName')} value={newTask.name} onChange={e => setNewTask({ ...newTask, name: e.target.value })} style={{ width: '100%', marginBottom: 12, padding: 8, borderRadius: 6, border: '1px solid #ccc' }} required />
+            <input placeholder={t('durationExample')} value={newTask.duration} onChange={e => setNewTask({ ...newTask, duration: e.target.value })} style={{ width: '100%', marginBottom: 12, padding: 8, borderRadius: 6, border: '1px solid #ccc' }} required />
             <select value={newTask.priority} onChange={e => setNewTask({ ...newTask, priority: e.target.value })} style={{ width: '100%', marginBottom: 18, padding: 8, borderRadius: 6, border: '1px solid #ccc' }}>
-              <option value="High">High Priority</option>
-              <option value="Medium">Medium Priority</option>
-              <option value="Low">Low Priority</option>
+              <option value="High">{t('highPriority')}</option>
+              <option value="Medium">{t('mediumPriority')}</option>
+              <option value="Low">{t('lowPriority')}</option>
             </select>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-              <button type="button" onClick={() => setShowAddForm(false)} style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '8px 16px', fontWeight: 'bold', cursor: 'pointer' }}>Cancel</button>
-              <button type="submit" style={{ background: '#6a11cb', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 16px', fontWeight: 'bold', cursor: 'pointer' }}>Add</button>
+              <button type="button" onClick={() => setShowAddForm(false)} style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '8px 16px', fontWeight: 'bold', cursor: 'pointer' }}>{t('cancel')}</button>
+              <button type="submit" style={{ background: '#6a11cb', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 16px', fontWeight: 'bold', cursor: 'pointer' }}>{t('add')}</button>
             </div>
           </form>
         </div>
@@ -138,15 +140,15 @@ function Calendar() {
       {cellToSchedule && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
           <form onSubmit={handleSchedule} style={{ background: '#fff', borderRadius: 12, padding: 32, minWidth: 320, boxShadow: '0 4px 24px rgba(44,62,80,0.15)' }}>
-            <h2 style={{ marginBottom: 18 }}>Schedule Task</h2>
+            <h2 style={{ marginBottom: 18 }}>{t('scheduleTask')}</h2>
             <select value={selectedTaskId} onChange={e => setSelectedTaskId(e.target.value)} style={{ width: '100%', marginBottom: 18, padding: 8, borderRadius: 6, border: '1px solid #ccc' }}>
               {unscheduledTasks.map(task => (
                 <option key={task.id} value={task.id}>{task.name} ({task.duration})</option>
               ))}
             </select>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-              <button type="button" onClick={() => setCellToSchedule(null)} style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '8px 16px', fontWeight: 'bold', cursor: 'pointer' }}>Cancel</button>
-              <button type="submit" style={{ background: '#6a11cb', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 16px', fontWeight: 'bold', cursor: 'pointer' }}>Schedule</button>
+              <button type="button" onClick={() => setCellToSchedule(null)} style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '8px 16px', fontWeight: 'bold', cursor: 'pointer' }}>{t('cancel')}</button>
+              <button type="submit" style={{ background: '#6a11cb', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 16px', fontWeight: 'bold', cursor: 'pointer' }}>{t('schedule')}</button>
             </div>
           </form>
         </div>
@@ -155,14 +157,20 @@ function Calendar() {
       {/* Main Content */}
       <div style={{ display: 'flex', padding: '2vw', gap: '2vw', width: '100%', boxSizing: 'border-box' }}>
         {/* Unscheduled Tasks Sidebar */}
-        <div className="card" style={{ maxWidth: 320, width: '100%', borderRadius: 16, padding: 24, minHeight: 600, boxSizing: 'border-box' }}>
-          <div style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 16 }}>Unscheduled Tasks</div>
-          {unscheduledTasks.length === 0 && <div style={{ color: '#888', fontStyle: 'italic' }}>No unscheduled tasks</div>}
+        <div className="calendar-sidebar">
+          <div className="page-title" style={{marginBottom: 18}}>{t('unscheduledTasks')}</div>
+          {unscheduledTasks.length === 0 && <div className="card-empty">{t('noUnscheduledTasks')}</div>}
           {unscheduledTasks.map((task, i) => (
-            <div key={task.id} className="calendar-task-card" style={{ marginBottom: 18, padding: 12, borderRadius: 8, borderLeft: `4px solid ${priorityColors[task.priority]}` }}>
-              <div style={{ fontWeight: 'bold' }}>{task.name}</div>
-              <div style={{ fontSize: 13, color: '#888' }}>{task.duration}</div>
-              <div style={{ fontSize: 13, color: priorityColors[task.priority], fontWeight: 'bold' }}>{task.priority} Priority</div>
+            <div key={task.id} className="unscheduled-task-card" style={{ borderLeftColor: task.priority === 'High' ? '#e57373' : task.priority === 'Medium' ? '#ffb74d' : '#81c784' }}>
+              <div className="unscheduled-task-title">{task.name}</div>
+              <div style={{ color: '#444', fontSize: '1rem', marginBottom: 2 }}>{task.duration}</div>
+              <span className={
+                task.priority === 'High' ? 'unscheduled-task-priority-high' :
+                task.priority === 'Medium' ? 'unscheduled-task-priority-medium' :
+                'unscheduled-task-priority-low'
+              }>
+                {t(task.priority.toLowerCase() + 'Priority')}
+              </span>
             </div>
           ))}
         </div>
@@ -172,14 +180,14 @@ function Calendar() {
           {/* Week Selector */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              <span style={{ fontWeight: 'bold', fontSize: 20 }}>Jun 15 - 21, 2025</span>
-              <button style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '4px 14px', fontWeight: 'bold', color: '#6a11cb', cursor: 'pointer' }}>Today</button>
+              <span className="section-title">{t('weekRange')}</span>
+              <button style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '4px 14px', fontWeight: 'bold', color: '#6a11cb', cursor: 'pointer' }}>{t('today')}</button>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '4px 14px', fontWeight: 'bold', color: '#6a11cb', cursor: 'pointer' }}>Week</button>
-              <button style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '4px 14px', fontWeight: 'bold', color: '#6a11cb', cursor: 'pointer' }}>Month</button>
-              <button style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '4px 14px', fontWeight: 'bold', color: '#6a11cb', cursor: 'pointer' }}>Time-blocked</button>
-              <button style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '4px 14px', fontWeight: 'bold', color: '#6a11cb', cursor: 'pointer' }}>Flexible</button>
+              <button style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '4px 14px', fontWeight: 'bold', color: '#6a11cb', cursor: 'pointer' }}>{t('week')}</button>
+              <button style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '4px 14px', fontWeight: 'bold', color: '#6a11cb', cursor: 'pointer' }}>{t('month')}</button>
+              <button style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '4px 14px', fontWeight: 'bold', color: '#6a11cb', cursor: 'pointer' }}>{t('timeBlocked')}</button>
+              <button style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '4px 14px', fontWeight: 'bold', color: '#6a11cb', cursor: 'pointer' }}>{t('flexible')}</button>
             </div>
           </div>
 
@@ -190,7 +198,7 @@ function Calendar() {
                 <tr>
                   <th style={{ width: 80 }}></th>
                   {days.map((day, i) => (
-                    <th key={day} style={{ textAlign: 'center', fontWeight: 'bold', color: '#6a11cb', fontSize: 15, padding: 6 }}>{day}<br /><span style={{ color: '#888', fontWeight: 'normal' }}>{dates[i]}</span></th>
+                    <th key={day} style={{ textAlign: 'center', fontWeight: 'bold', color: '#6a11cb', fontSize: 15, padding: 6 }}>{t(day)}<br /><span style={{ color: '#888', fontWeight: 'normal' }}>{dates[i]}</span></th>
                   ))}
                 </tr>
               </thead>

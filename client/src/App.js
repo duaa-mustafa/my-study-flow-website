@@ -17,12 +17,15 @@ import Layout from './Layout';
 import SetAvailability from './SetAvailability';
 import FocusMode from './FocusMode';
 import Assignments from './Assignments';
+import { SettingsProvider } from './SettingsContext';
 
-export default function App() {
+export default function WrappedApp() {
   // Check for token in localStorage
   const isAuthenticated = !!localStorage.getItem('token');
 
   return (
+    <SettingsProvider>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
     <Router>
       <Routes>
         {/* Public routes */}
@@ -55,5 +58,6 @@ export default function App() {
         )}
       </Routes>
     </Router>
+    </SettingsProvider>
   );
 }
