@@ -1,0 +1,97 @@
+.registration-main {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  align-items: center;
+  justify-content: center;
+}
+
+.registration-left {
+  flex: 1;
+  color: #fff;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 350px;
+  max-width: 450px;
+}
+
+.registration-left h1 {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+
+.registration-left p {
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+}
+
+.features-list ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.features-list li {
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.registration-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(44, 62, 80, 0.2);
+  padding: 40px 32px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  margin-left: 40px;
+}
+
+.registration-card h2 {
+  margin-bottom: 24px;
+  color: #6a11cb;
+}
+
+.registration-card input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  border: 1px solid #b3c6e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #f0f6ff;
+  color: #222;
+  box-sizing: border-box;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.registration-card input:focus {
+  outline: none;
+  border-color: #4f8cff;
+  background: #e6f0ff;
+}
+
+.registration-card button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+
+.registration-card button:hover {
+  background: linear-gradient(90deg, #2575fc 0%, #6a11cb 100%);
+}
+
+.registration-card .message {
+  margin-top: 16px;
+  font-weight: bold;
+}
