@@ -68,10 +68,10 @@ export default function Subjects() {
           {subjects.map(subject => (
             <div
               key={subject.id}
+              className="subject-card"
               style={{
                 flex: '1 1 260px',
                 minWidth: 260,
-                background: '#fafbfc',
                 borderRadius: 18,
                 boxShadow: '0 2px 12px #e3e0ff',
                 padding: 28,
