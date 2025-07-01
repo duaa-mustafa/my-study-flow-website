@@ -1754,3 +1754,13 @@ body, .card, .sidebar-link, .page-title, .section-title {
   border-radius: 8px;
   transition: width 0.4s cubic-bezier(.4,2,.6,1);
 }
+
+/* Subject card info text color for both themes */
+.subject-year, .subject-major {
+  color: #23283a;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+body.theme-dark .subject-year, body.theme-dark .subject-major {
+  color: #e3e0ff !important;
+}

@@ -87,8 +87,8 @@ export default function Subjects() {
               onMouseOut={e => e.currentTarget.style.boxShadow = '0 2px 12px #e3e0ff'}
             >
               <div className="section-title">{subject.name}</div>
-              <div>{t('year')}: {subject.academicYear}</div>
-              <div>{t('major')}: <b>{t(subject.major.replace(/\s+/g, '').toLowerCase()) || subject.major}</b></div>
+              <div className="subject-year">{t('year')}: {subject.academicYear}</div>
+              <div className="subject-major">{t('major')}: <b>{t(subject.major.replace(/\s+/g, '').toLowerCase()) || subject.major}</b></div>
               <button className="main-btn" onClick={() => handleDelete(subject.id)}>{t('delete')}</button>
             </div>
           ))}
