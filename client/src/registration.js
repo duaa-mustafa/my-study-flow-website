@@ -41,13 +41,7 @@ function Register() {
   };
 
   return (
-    <div className="registration-main" style={{
-      display: 'flex',
-      minHeight: '100vh',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'inherit'
-    }}>
+    <div className="registration-container">
       <div style={{
         display: 'flex',
         flexDirection: 'row',
