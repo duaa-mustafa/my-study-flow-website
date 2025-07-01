@@ -9,8 +9,8 @@ const Assignment = sequelize.define('Assignment', {
   due: { type: DataTypes.STRING, allowNull: false },
   priority: { type: DataTypes.STRING, allowNull: false },
   status: { type: DataTypes.STRING, allowNull: false },
+}, {
+  tableName: 'assignments'
 });
-
-Assignment.sync();
 
 module.exports = Assignment; 

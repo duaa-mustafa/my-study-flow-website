@@ -8,6 +8,8 @@ const Availability = sequelize.define('Availability', {
   start: { type: DataTypes.STRING, allowNull: false },
   end: { type: DataTypes.STRING, allowNull: false },
   best: { type: DataTypes.BOOLEAN, defaultValue: false },
+}, {
+  tableName: 'availabilities'
 });
 
 module.exports = Availability;
