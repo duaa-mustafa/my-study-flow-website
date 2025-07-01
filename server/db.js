@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { Sequelize } = require('sequelize');
 
 const sequelize = new Sequelize(
@@ -9,6 +10,12 @@ const sequelize = new Sequelize(
     port: process.env.DB_PORT || 5432,
     dialect: process.env.DB_DIALECT || 'postgres',
     logging: false,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false, // For self-signed certificates (Render uses trusted certs, but this is safest for dev)
+      }
+    }
   }
 );
 
