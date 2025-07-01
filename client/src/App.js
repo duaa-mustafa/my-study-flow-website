@@ -51,6 +51,7 @@ export default function WrappedApp() {
             <Route path="assignments" element={<Assignments />} />
             {/* Default route - redirect to dashboard */}
             <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Route>
         ) : (
           // If not authenticated, redirect to login
