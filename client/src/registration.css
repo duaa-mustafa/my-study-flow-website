@@ -102,3 +102,38 @@
   margin-top: 16px;
   font-weight: bold;
 }
+
+@media (max-width: 700px) {
+  .registration-main {
+    flex-direction: column !important;
+    padding: 0 !important;
+    min-height: 100vh !important;
+  }
+  .registration-left {
+    min-width: 0 !important;
+    max-width: 100vw !important;
+    width: 100vw !important;
+    padding: 32px 12px !important;
+    align-items: center !important;
+    text-align: center !important;
+    border-radius: 0 !important;
+  }
+  .registration-left h1 {
+    font-size: 2rem !important;
+  }
+  .registration-card {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    margin-left: 0 !important;
+    border-radius: 0 !important;
+    padding: 28px 10px !important;
+    box-shadow: none !important;
+  }
+  .registration-card input {
+    font-size: 1rem !important;
+    padding: 10px 8px !important;
+  }
+  .features-list ul {
+    padding-left: 18px !important;
+  }
+}
