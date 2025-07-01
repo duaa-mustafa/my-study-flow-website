@@ -18,7 +18,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-      "build": "react-scripts build && cpx public/static.json build/"
+      "build": "react-scripts build && cpx public/static.json build/",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
