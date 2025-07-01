@@ -27,9 +27,10 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Sync DB
+// Sync DB and start server
 sequelize.sync().then(() => {
   console.log('Database synced');
+  app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
 });
 
 // Auth Routes
@@ -193,5 +194,3 @@ app.delete('/assignments/:id', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Failed to delete assignment' });
   }
 });
-
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
