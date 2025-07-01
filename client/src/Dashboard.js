@@ -23,7 +23,7 @@ const fetchDeadlines = () => new Promise(resolve => setTimeout(() => resolve([
 
 function countTasksDone(assignments) {
   const safeAssignments = Array.isArray(assignments) ? assignments : [];
-  return safeAssignments.filter(a => a.status === 'Complete').length;
+  return safeAssignments.filter(a => (a.status || '').toLowerCase() === 'complete').length;
 }
 
 function countDeadlines(assignments) {
@@ -32,7 +32,7 @@ function countDeadlines(assignments) {
   return safeAssignments.filter(a => {
     if (!a.due) return false;
     const dueDate = new Date(a.due);
-    return dueDate >= now;
+    return dueDate >= now && (a.status || '').toLowerCase() !== 'complete';
   }).length;
 }
 
