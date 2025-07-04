@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSettings } from './SettingsContext';
+import { useAssignments } from './AssignmentsContext';
 
 const initialUnscheduledTasks = [
   { id: 1, name: 'Software Engineering Project', duration: '1 hour', priority: 'High' },
@@ -52,14 +53,98 @@ const priorityColors = {
   Low: '#81c784',
 };
 
+// Assignment type durations
+const assignmentDurations = {
+  'Database Systems': '3 hours',
+  'Software Engineering': '4 hours',
+  'Operating Systems': '2.5 hours',
+  'Computer Networks': '3 hours',
+  'Computer Science': '2 hours',
+  'default': '2 hours'
+};
+
 function Calendar() {
   const { t } = useSettings();
+  const { assignments, loading: assignmentsLoading } = useAssignments();
   const [unscheduledTasks, setUnscheduledTasks] = useState(initialUnscheduledTasks);
   const [scheduledTasks, setScheduledTasks] = useState(initialScheduledTasks);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newTask, setNewTask] = useState({ name: '', duration: '', priority: 'Medium' });
   const [cellToSchedule, setCellToSchedule] = useState(null); // { day, time }
   const [selectedTaskId, setSelectedTaskId] = useState('');
+
+  // Get duration based on assignment subject
+  const getAssignmentDuration = (subject) => {
+    return assignmentDurations[subject] || assignmentDurations['default'];
+  };
+
+  // Auto-schedule assignments based on due dates
+  const autoScheduleAssignments = (assignmentTasks) => {
+    const autoScheduled = [];
+    const remainingTasks = [];
+
+    assignmentTasks.forEach((task, index) => {
+      if (task.due) {
+        // Calculate days until due date
+        const dueDate = new Date(task.due);
+        const today = new Date();
+        const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+        
+        // Auto-schedule if due within 7 days
+        if (daysUntilDue <= 7 && daysUntilDue > 0) {
+          // Find available time slot (simple algorithm)
+          const dayIndex = Math.min(daysUntilDue - 1, 6); // 0-6 for days
+          const timeSlot = '10:00'; // Default time
+          
+          const autoScheduledTask = {
+            ...task,
+            day: dayIndex,
+            start: timeSlot,
+            end: getEndTime(timeSlot, task.duration),
+            color: priorityColors[task.priority],
+            autoScheduled: true
+          };
+          
+          autoScheduled.push(autoScheduledTask);
+        } else {
+          remainingTasks.push(task);
+        }
+      } else {
+        remainingTasks.push(task);
+      }
+    });
+
+    return { autoScheduled, remainingTasks };
+  };
+
+  // Convert assignments to unscheduled tasks format
+  useEffect(() => {
+    if (assignments && assignments.length > 0) {
+      const assignmentTasks = assignments
+        .filter(assignment => assignment.status !== 'Complete') // Only show incomplete assignments
+        .map(assignment => ({
+          id: `assignment-${assignment.id}`,
+          name: assignment.title,
+          duration: getAssignmentDuration(assignment.subject),
+          priority: assignment.priority || 'Medium',
+          subject: assignment.subject,
+          due: assignment.due,
+          type: 'assignment',
+          assignmentId: assignment.id
+        }));
+
+      // Auto-schedule assignments
+      const { autoScheduled, remainingTasks } = autoScheduleAssignments(assignmentTasks);
+      
+      // Add auto-scheduled tasks to calendar
+      if (autoScheduled.length > 0) {
+        setScheduledTasks(prev => [...prev, ...autoScheduled]);
+      }
+
+      // Combine manual tasks with remaining assignment tasks
+      setUnscheduledTasks([...initialUnscheduledTasks, ...remainingTasks]);
+    }
+  }, [assignments]);
 
   // Add new unscheduled task
   const handleAddTask = (e) => {
@@ -82,7 +167,7 @@ function Calendar() {
   // Confirm scheduling
   const handleSchedule = (e) => {
     e.preventDefault();
-    const task = unscheduledTasks.find(t => t.id === Number(selectedTaskId));
+    const task = unscheduledTasks.find(t => t.id === Number(selectedTaskId) || t.id === selectedTaskId);
     if (!task) return;
     setScheduledTasks([
       ...scheduledTasks,
@@ -94,6 +179,11 @@ function Calendar() {
         end: getEndTime(cellToSchedule.time, task.duration),
         color: priorityColors[task.priority],
         priority: task.priority,
+        type: task.type,
+        assignmentId: task.assignmentId,
+        subject: task.subject,
+        due: task.due,
+        autoScheduled: false
       }
     ]);
     setUnscheduledTasks(unscheduledTasks.filter(t => t.id !== task.id));
@@ -109,7 +199,11 @@ function Calendar() {
       id: task.id,
       name: task.name,
       duration: getDuration(task.start, task.end),
-      priority: task.priority
+      priority: task.priority,
+      type: task.type,
+      assignmentId: task.assignmentId,
+      subject: task.subject,
+      due: task.due
     }]);
     setScheduledTasks(scheduledTasks.filter(t => t.id !== taskId));
   };
@@ -143,7 +237,10 @@ function Calendar() {
             <h2 style={{ marginBottom: 18 }}>{t('scheduleTask')}</h2>
             <select value={selectedTaskId} onChange={e => setSelectedTaskId(e.target.value)} style={{ width: '100%', marginBottom: 18, padding: 8, borderRadius: 6, border: '1px solid #ccc' }}>
               {unscheduledTasks.map(task => (
-                <option key={task.id} value={task.id}>{task.name} ({task.duration})</option>
+                <option key={task.id} value={task.id}>
+                  {task.name} ({task.duration})
+                  {task.type === 'assignment' && ` - Due: ${task.due}`}
+                </option>
               ))}
             </select>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
@@ -159,17 +256,36 @@ function Calendar() {
         {/* Unscheduled Tasks Sidebar */}
         <div className="calendar-sidebar">
           <div className="page-title" style={{marginBottom: 18}}>{t('unscheduledTasks')}</div>
-          {unscheduledTasks.length === 0 && <div className="card-empty">{t('noUnscheduledTasks')}</div>}
+          {assignmentsLoading && <div className="card-empty">Loading assignments...</div>}
+          {!assignmentsLoading && unscheduledTasks.length === 0 && <div className="card-empty">{t('noUnscheduledTasks')}</div>}
           {unscheduledTasks.map((task, i) => (
-            <div key={task.id} className="unscheduled-task-card" style={{ borderLeftColor: task.priority === 'High' ? '#e57373' : task.priority === 'Medium' ? '#ffb74d' : '#81c784' }}>
-              <div className="unscheduled-task-title">{task.name}</div>
+            <div key={task.id} className="unscheduled-task-card" style={{ 
+              borderLeftColor: task.priority === 'High' ? '#e57373' : task.priority === 'Medium' ? '#ffb74d' : '#81c784',
+              borderLeftWidth: task.type === 'assignment' ? '4px' : '2px',
+              background: task.type === 'assignment' ? '#f8f9ff' : '#fff',
+              border: task.type === 'assignment' ? '1px solid #e3e0ff' : '1px solid #eee'
+            }}>
+              <div className="unscheduled-task-title">
+                {task.name}
+                {task.type === 'assignment' && (
+                  <span style={{ fontSize: '0.8rem', color: '#6a11cb', marginLeft: 8 }}>
+                    📚 {task.subject}
+                  </span>
+                )}
+              </div>
               <div style={{ color: '#444', fontSize: '1rem', marginBottom: 2 }}>{task.duration}</div>
+              {task.type === 'assignment' && task.due && (
+                <div style={{ color: '#ff9800', fontSize: '0.9rem', marginBottom: 4 }}>
+                  📅 Due: {task.due}
+                </div>
+              )}
               <span className={
                 task.priority === 'High' ? 'unscheduled-task-priority-high' :
                 task.priority === 'Medium' ? 'unscheduled-task-priority-medium' :
                 'unscheduled-task-priority-low'
               }>
                 {t(task.priority.toLowerCase() + 'Priority')}
+                {task.type === 'assignment' && ' (Assignment)'}
               </span>
             </div>
           ))}
@@ -211,9 +327,37 @@ function Calendar() {
                       const task = scheduledTasks.find(t => t.day === colIdx && t.start === time);
                       if (task) {
                         return (
-                          <td key={colIdx} rowSpan={getRowSpan(task)} style={{ background: task.color, borderRadius: 8, textAlign: 'center', fontWeight: 'bold', color: '#333', fontSize: 14, position: 'relative', minWidth: 80, border: '1px solid #fff', cursor: 'pointer' }} onDoubleClick={() => handleUnschedule(task.id)}>
-                            {task.name}<br />
+                          <td key={colIdx} rowSpan={getRowSpan(task)} style={{ 
+                            background: task.color, 
+                            borderRadius: 8, 
+                            textAlign: 'center', 
+                            fontWeight: 'bold', 
+                            color: '#333', 
+                            fontSize: 14, 
+                            position: 'relative', 
+                            minWidth: 80, 
+                            border: task.type === 'assignment' ? '2px solid #6a11cb' : '1px solid #fff',
+                            cursor: 'pointer',
+                            boxShadow: task.autoScheduled ? '0 2px 8px rgba(106,17,203,0.3)' : 'none'
+                          }} onDoubleClick={() => handleUnschedule(task.id)}>
+                            {task.name}
+                            {task.type === 'assignment' && (
+                              <div style={{ fontSize: '0.8rem', color: '#fff', marginTop: 2 }}>
+                                📚 {task.subject}
+                              </div>
+                            )}
+                            <br />
                             <span style={{ fontWeight: 'normal', fontSize: 12 }}>{task.start} AM - {task.end} PM</span>
+                            {task.type === 'assignment' && task.due && (
+                              <div style={{ fontSize: '0.8rem', color: '#fff', marginTop: 2 }}>
+                                📅 Due: {task.due}
+                              </div>
+                            )}
+                            {task.autoScheduled && (
+                              <div style={{ fontSize: '0.7rem', color: '#fff', marginTop: 2, background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: 4 }}>
+                                🤖 Auto-scheduled
+                              </div>
+                            )}
                             <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>[Double-click to unschedule]</div>
                           </td>
                         );
