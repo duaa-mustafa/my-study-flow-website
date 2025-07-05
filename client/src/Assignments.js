@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSettings } from './SettingsContext';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const priorityColors = {
   High: '#e57373',
@@ -75,6 +77,18 @@ export default function Assignments() {
       body: JSON.stringify({ ...assignment, status }),
     });
     setAssignments(assignments.map(a => a.id === id ? { ...a, status } : a));
+    if (status === 'Complete') {
+      toast.success('🎉 Great job! You completed an assignment! Keep up the good work!', {
+        position: 'top-center',
+        autoClose: 3500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      });
+    }
   };
 
   const handleDelete = async (id) => {
@@ -87,6 +101,7 @@ export default function Assignments() {
 
   return (
     <div id="main-content" className="card" style={{ maxWidth: 1100, margin: '40px auto', borderRadius: 20, padding: 36, minHeight: 500, background: 'linear-gradient(135deg, #f3eaff 0%, #e3e0ff 100%)' }}>
+      <ToastContainer />
       <h2 className="page-title">{t('assignments')}</h2>
       {/* Add Assignment Form */}
       <form onSubmit={handleAddAssignment} className="card assignment-form">

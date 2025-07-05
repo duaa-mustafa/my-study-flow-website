@@ -113,6 +113,16 @@ const faqs = [
           </div>
         )}
       </div>
+      {/* Contact Us Section */}
+      <div style={{ maxWidth: 900, margin: '32px auto 0 auto', borderRadius: 20, padding: 32, background: '#fafbfc', boxShadow: '0 2px 12px #e3e0ff', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12 }}>
+        <h3 style={{ color: '#6a11cb', marginBottom: 8 }}>Contact Us</h3>
+        <div style={{ fontSize: 17, color: '#333', marginBottom: 4 }}>
+          <b>Email:</b> <a href="mailto:studyflow.support@email.com" style={{ color: '#2575fc', textDecoration: 'underline' }}>studyflow.support@email.com</a>
+        </div>
+        <div style={{ fontSize: 17, color: '#333' }}>
+          <b>Phone:</b> <a href="tel:+249912345678" style={{ color: '#2575fc', textDecoration: 'underline' }}>+249 91 234 5678</a>
+        </div>
+      </div>
     </div>
   );
 }

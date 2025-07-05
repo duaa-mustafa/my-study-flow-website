@@ -41,7 +41,6 @@ const initialScheduledTasks = [
 ];
 
 const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-const dates = [4, 5, 6, 7, 8, 9, 10];
 const times = [
   '8:00', '9:00', '10:00', '11:00', '12:00',
   '1:00', '2:00', '3:00', '4:00',
@@ -63,6 +62,41 @@ const assignmentDurations = {
   'default': '2 hours'
 };
 
+function getMonthMatrix(year, month) {
+  // Returns a 2D array (weeks x days) for the given month
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const matrix = [];
+  let week = [];
+  let dayOfWeek = firstDay.getDay();
+  // Fill initial empty days
+  for (let i = 0; i < dayOfWeek; i++) week.push(null);
+  for (let d = 1; d <= lastDay.getDate(); d++) {
+    week.push(d);
+    if (week.length === 7) {
+      matrix.push(week);
+      week = [];
+    }
+  }
+  // Fill trailing empty days
+  if (week.length > 0) {
+    while (week.length < 7) week.push(null);
+    matrix.push(week);
+  }
+  return matrix;
+}
+
+function getWeekDates(date) {
+  // Returns array of dates for the week containing 'date'
+  const start = new Date(date);
+  start.setDate(start.getDate() - start.getDay()); // Sunday
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    return d;
+  });
+}
+
 function Calendar() {
   const { t } = useSettings();
   const { assignments, loading: assignmentsLoading } = useAssignments();
@@ -72,6 +106,11 @@ function Calendar() {
   const [newTask, setNewTask] = useState({ name: '', duration: '', priority: 'Medium' });
   const [cellToSchedule, setCellToSchedule] = useState(null); // { day, time }
   const [selectedTaskId, setSelectedTaskId] = useState('');
+  const [mode, setMode] = useState('time-blocked'); // 'time-blocked' or 'flexible'
+  const [flexiblePlan, setFlexiblePlan] = useState([]); // [{ day: 0, tasks: [...] }, ...]
+  const [calendarView, setCalendarView] = useState('week'); // 'week' or 'month'
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [currentWeekDate, setCurrentWeekDate] = useState(new Date());
 
   // Get duration based on assignment subject
   const getAssignmentDuration = (subject) => {
@@ -146,6 +185,25 @@ function Calendar() {
     }
   }, [assignments]);
 
+  // Flexible mode: auto-distribute unscheduled tasks across days
+  useEffect(() => {
+    if (mode === 'flexible') {
+      // Combine all tasks (scheduled and unscheduled)
+      const allTasks = [
+        ...scheduledTasks.map(t => ({ ...t, scheduled: true })),
+        ...unscheduledTasks.map(t => ({ ...t, scheduled: false })),
+      ];
+      // Distribute tasks evenly across days
+      const plan = days.map((_, dayIdx) => ({ day: dayIdx, tasks: [] }));
+      let i = 0;
+      for (const task of allTasks) {
+        plan[i % 7].tasks.push(task);
+        i++;
+      }
+      setFlexiblePlan(plan);
+    }
+  }, [mode, scheduledTasks, unscheduledTasks]);
+
   // Add new unscheduled task
   const handleAddTask = (e) => {
     e.preventDefault();
@@ -208,8 +266,44 @@ function Calendar() {
     setScheduledTasks(scheduledTasks.filter(t => t.id !== taskId));
   };
 
+  // Month view helpers
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
+  const monthMatrix = getMonthMatrix(year, month);
+  const today = new Date();
+  // Week view: get dates for the current week
+  const weekDates = getWeekDates(currentWeekDate);
+
+  // Helper: get tasks for a given date
+  function getTasksForDate(day) {
+    if (!day) return [];
+    // Format: YYYY-MM-DD
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    if (mode === 'time-blocked') {
+      return scheduledTasks.filter(t => t.due === dateStr);
+    } else {
+      // Flexible: flatten all tasks in flexiblePlan
+      return flexiblePlan.flatMap(dayPlan => dayPlan.tasks).filter(t => t.due === dateStr);
+    }
+  }
+
   return (
     <div id="main-content" style={{ minHeight: '100vh' }}>
+      {/* Mode Toggle */}
+      <div style={{ display: 'flex', gap: 12, marginBottom: 18 }}>
+        <button
+          className={mode === 'time-blocked' ? 'main-btn' : 'main-btn-secondary'}
+          onClick={() => setMode('time-blocked')}
+        >
+          Time-Blocked Mode
+        </button>
+        <button
+          className={mode === 'flexible' ? 'main-btn' : 'main-btn-secondary'}
+          onClick={() => setMode('flexible')}
+        >
+          Flexible Mode
+        </button>
+      </div>
       {/* Add Task Modal */}
       {showAddForm && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
@@ -291,88 +385,222 @@ function Calendar() {
           ))}
         </div>
 
-        {/* Calendar Grid */}
+        {/* Calendar Grid or Flexible Plan */}
         <div style={{ flex: 1, background: '#fff', borderRadius: 16, boxShadow: '0 4px 16px rgba(44,62,80,0.07)', padding: 24, minWidth: 0, width: '100%', boxSizing: 'border-box' }}>
           {/* Week Selector */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              <span className="section-title">{t('weekRange')}</span>
-              <button style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '4px 14px', fontWeight: 'bold', color: '#6a11cb', cursor: 'pointer' }}>{t('today')}</button>
+              <span className="section-title">{t('weekRange') || 'Week Range'}</span>
+              <button
+                style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '4px 14px', fontWeight: 'bold', color: '#6a11cb', cursor: 'pointer' }}
+                onClick={() => {
+                  setCurrentWeekDate(new Date());
+                  setCurrentMonth(new Date());
+                }}
+              >
+                {t('today') || 'today'}
+              </button>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '4px 14px', fontWeight: 'bold', color: '#6a11cb', cursor: 'pointer' }}>{t('week')}</button>
-              <button style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '4px 14px', fontWeight: 'bold', color: '#6a11cb', cursor: 'pointer' }}>{t('month')}</button>
-              <button style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '4px 14px', fontWeight: 'bold', color: '#6a11cb', cursor: 'pointer' }}>{t('timeBlocked')}</button>
-              <button style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '4px 14px', fontWeight: 'bold', color: '#6a11cb', cursor: 'pointer' }}>{t('flexible')}</button>
+              <button
+                className={calendarView === 'week' ? 'main-btn' : 'main-btn-secondary'}
+                onClick={() => setCalendarView('week')}
+              >
+                {t('week') || 'Week'}
+              </button>
+              <button
+                className={calendarView === 'month' ? 'main-btn' : 'main-btn-secondary'}
+                onClick={() => setCalendarView('month')}
+              >
+                {t('month') || 'Month'}
+              </button>
             </div>
           </div>
 
-          {/* Calendar Table */}
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-              <thead>
-                <tr>
-                  <th style={{ width: 80 }}></th>
-                  {days.map((day, i) => (
-                    <th key={day} style={{ textAlign: 'center', fontWeight: 'bold', color: '#6a11cb', fontSize: 15, padding: 6 }}>{t(day)}<br /><span style={{ color: '#888', fontWeight: 'normal' }}>{dates[i]}</span></th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {times.map((time, rowIdx) => (
-                  <tr key={time}>
-                    <td style={{ textAlign: 'right', color: '#888', fontSize: 14, padding: 6 }}>{time}</td>
-                    {days.map((day, colIdx) => {
-                      // Find a task scheduled for this cell
-                      const task = scheduledTasks.find(t => t.day === colIdx && t.start === time);
-                      if (task) {
-                        return (
-                          <td key={colIdx} rowSpan={getRowSpan(task)} style={{ 
-                            background: task.color, 
-                            borderRadius: 8, 
-                            textAlign: 'center', 
-                            fontWeight: 'bold', 
-                            color: '#333', 
-                            fontSize: 14, 
-                            position: 'relative', 
-                            minWidth: 80, 
-                            border: task.type === 'assignment' ? '2px solid #6a11cb' : '1px solid #fff',
-                            cursor: 'pointer',
-                            boxShadow: task.autoScheduled ? '0 2px 8px rgba(106,17,203,0.3)' : 'none'
-                          }} onDoubleClick={() => handleUnschedule(task.id)}>
+          {calendarView === 'week' ? (
+            mode === 'time-blocked' ? (
+              // Time-Blocked calendar grid (existing code)
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                  <thead>
+                    <tr>
+                      <th style={{ width: 80 }}></th>
+                      {days.map((day, i) => (
+                        <th key={day} style={{ textAlign: 'center', fontWeight: 'bold', color: '#6a11cb', fontSize: 15, padding: 6 }}>
+                          {t(day)}<br />
+                          <span style={{ color: '#888', fontWeight: 'normal' }}>
+                            {weekDates[i].getDate()}
+                          </span>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {times.map((time, rowIdx) => (
+                      <tr key={time}>
+                        <td style={{ textAlign: 'right', color: '#888', fontSize: 14, padding: 6 }}>{time}</td>
+                        {days.map((day, colIdx) => {
+                          // Find a task scheduled for this cell
+                          const task = scheduledTasks.find(t => t.day === colIdx && t.start === time);
+                          if (task) {
+                            return (
+                              <td key={colIdx} rowSpan={getRowSpan(task)} style={{ 
+                                background: task.color, 
+                                borderRadius: 8, 
+                                textAlign: 'center', 
+                                fontWeight: 'bold', 
+                                color: '#333', 
+                                fontSize: 14, 
+                                position: 'relative', 
+                                minWidth: 80, 
+                                border: task.type === 'assignment' ? '2px solid #6a11cb' : '1px solid #fff',
+                                cursor: 'pointer',
+                                boxShadow: task.autoScheduled ? '0 2px 8px rgba(106,17,203,0.3)' : 'none'
+                              }} onDoubleClick={() => handleUnschedule(task.id)}>
+                                {task.name}
+                                {task.type === 'assignment' && (
+                                  <div style={{ fontSize: '0.8rem', color: '#fff', marginTop: 2 }}>
+                                    📚 {task.subject}
+                                  </div>
+                                )}
+                                <br />
+                                <span style={{ fontWeight: 'normal', fontSize: 12 }}>{task.start} AM - {task.end} PM</span>
+                                {task.type === 'assignment' && task.due && (
+                                  <div style={{ fontSize: '0.8rem', color: '#fff', marginTop: 2 }}>
+                                    📅 Due: {task.due}
+                                  </div>
+                                )}
+                                {task.autoScheduled && (
+                                  <div style={{ fontSize: '0.7rem', color: '#fff', marginTop: 2, background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: 4 }}>
+                                    🤖 Auto-scheduled
+                                  </div>
+                                )}
+                                <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>[Double-click to unschedule]</div>
+                              </td>
+                            );
+                          }
+                          // If this cell is covered by a rowSpan, skip rendering
+                          if (isCellCovered(scheduledTasks, colIdx, time, rowIdx)) {
+                            return null;
+                          }
+                          return <td key={colIdx} style={{ border: '1px solid #f0f0f0', minWidth: 80, height: 40, cursor: unscheduledTasks.length > 0 ? 'pointer' : 'default', background: '#fafbfc' }} onClick={() => unscheduledTasks.length > 0 && handleCellClick(colIdx, time)}></td>;
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              // Flexible mode: show per-day task lists
+              <div style={{ overflowX: 'auto', width: '100%' }}>
+                <div style={{ display: 'flex', gap: 16, minWidth: 1050, paddingBottom: 8 }}>
+                  {flexiblePlan.map(dayPlan => (
+                    <div key={dayPlan.day} style={{ minWidth: 130, maxWidth: 180, background: '#f7f8fa', borderRadius: 10, padding: 12, marginRight: 4, boxSizing: 'border-box', flexShrink: 0 }}>
+                      <div style={{ fontWeight: 'bold', color: '#6a11cb', marginBottom: 8 }}>{t(days[dayPlan.day])}</div>
+                      {dayPlan.tasks.length === 0 ? (
+                        <div style={{ color: '#bbb', fontSize: 14 }}>No tasks</div>
+                      ) : (
+                        dayPlan.tasks.map(task => (
+                          <div key={task.id} style={{
+                            background: task.type === 'assignment' ? '#f8f9ff' : '#fff',
+                            border: task.type === 'assignment' ? '1px solid #e3e0ff' : '1px solid #eee',
+                            borderLeft: `4px solid ${priorityColors[task.priority] || '#6a11cb'}`,
+                            borderRadius: 8,
+                            marginBottom: 8,
+                            padding: 8,
+                            fontWeight: 'bold',
+                            fontSize: 15,
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '100%'
+                          }} title={task.name}>
                             {task.name}
                             {task.type === 'assignment' && (
-                              <div style={{ fontSize: '0.8rem', color: '#fff', marginTop: 2 }}>
-                                📚 {task.subject}
-                              </div>
+                              <span style={{ fontSize: '0.8rem', color: '#6a11cb', marginLeft: 8 }}>📚 {task.subject}</span>
                             )}
-                            <br />
-                            <span style={{ fontWeight: 'normal', fontSize: 12 }}>{task.start} AM - {task.end} PM</span>
+                            <div style={{ color: '#444', fontSize: '1rem', marginBottom: 2 }}>{task.duration}</div>
                             {task.type === 'assignment' && task.due && (
-                              <div style={{ fontSize: '0.8rem', color: '#fff', marginTop: 2 }}>
-                                📅 Due: {task.due}
+                              <div style={{ color: '#ff9800', fontSize: '0.9rem', marginBottom: 4 }}>📅 Due: {task.due}</div>
+                            )}
+                            <span style={{ fontSize: 12, color: priorityColors[task.priority] }}>{task.priority}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          ) : (
+            // Month view
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <button className="main-btn-secondary" onClick={() => setCurrentMonth(new Date(year, month - 1, 1))}>{'<'}</button>
+                <span style={{ fontWeight: 'bold', fontSize: 20, color: '#6a11cb' }}>{currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
+                <button className="main-btn-secondary" onClick={() => setCurrentMonth(new Date(year, month + 1, 1))}>{'>'}</button>
+              </div>
+              <div style={{ overflowX: 'auto', width: '100%' }}>
+                <table style={{ minWidth: 900, width: '100%', borderCollapse: 'separate', borderSpacing: 4, background: '#f7f8fa', borderRadius: 12, tableLayout: 'fixed' }}>
+                  <thead>
+                    <tr>
+                      {days.map(day => (
+                        <th key={day} style={{ color: '#2575fc', fontWeight: 'bold', padding: 6, textAlign: 'center', fontSize: 15, background: '#f7f8fa', position: 'sticky', top: 0, zIndex: 1 }}>{t(day)}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {monthMatrix.map((week, i) => (
+                      <tr key={i}>
+                        {week.map((day, j) => (
+                          <td key={j} style={{
+                            minWidth: 120,
+                            height: 120,
+                            verticalAlign: 'top',
+                            background: day && today.getDate() === day && today.getMonth() === month && today.getFullYear() === year ? '#e3e0ff' : '#fff',
+                            border: '1px solid #e3e0ff',
+                            padding: 8,
+                            position: 'relative',
+                            boxSizing: 'border-box',
+                            overflow: 'hidden',
+                            // Remove borderRadius for a clean grid
+                          }}>
+                            {day && <div style={{ fontWeight: 'bold', color: '#6a11cb', fontSize: 16, marginBottom: 4 }}>{day}</div>}
+                            {getTasksForDate(day).slice(0, 3).map(task => (
+                              <div key={task.id} style={{
+                                background: task.type === 'assignment' ? '#f8f9ff' : '#fff',
+                                border: task.type === 'assignment' ? '1px solid #e3e0ff' : '1px solid #eee',
+                                borderLeft: `4px solid ${priorityColors[task.priority] || '#6a11cb'}`,
+                                borderRadius: 6,
+                                margin: '3px 0',
+                                padding: '2px 4px',
+                                fontSize: 12,
+                                fontWeight: 'bold',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                maxWidth: '100%'
+                              }} title={task.name}>
+                                {task.name}
+                                {task.type === 'assignment' && (
+                                  <span style={{ fontSize: '0.8rem', color: '#6a11cb', marginLeft: 4 }}>📚 {task.subject}</span>
+                                )}
+                              </div>
+                            ))}
+                            {getTasksForDate(day).length > 3 && (
+                              <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>
+                                +{getTasksForDate(day).length - 3} more
                               </div>
                             )}
-                            {task.autoScheduled && (
-                              <div style={{ fontSize: '0.7rem', color: '#fff', marginTop: 2, background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: 4 }}>
-                                🤖 Auto-scheduled
-                              </div>
-                            )}
-                            <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>[Double-click to unschedule]</div>
                           </td>
-                        );
-                      }
-                      // If this cell is covered by a rowSpan, skip rendering
-                      if (isCellCovered(scheduledTasks, colIdx, time, rowIdx)) {
-                        return null;
-                      }
-                      return <td key={colIdx} style={{ border: '1px solid #f0f0f0', minWidth: 80, height: 40, cursor: unscheduledTasks.length > 0 ? 'pointer' : 'default', background: '#fafbfc' }} onClick={() => unscheduledTasks.length > 0 && handleCellClick(colIdx, time)}></td>;
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

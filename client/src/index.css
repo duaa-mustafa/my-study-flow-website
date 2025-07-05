@@ -11,3 +11,18 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+:root {
+  --rewards-bg: #f5f7fb;
+  --rewards-card-bg: #fff;
+  --rewards-card-text: #222;
+  --rewards-card-muted: #888;
+  --rewards-card-border: #e0e0e0;
+}
+.dark, body.dark {
+  --rewards-bg: #181a20;
+  --rewards-card-bg: #23262f;
+  --rewards-card-text: #f5f7fb;
+  --rewards-card-muted: #b3b8d1;
+  --rewards-card-border: #353945;
+}
