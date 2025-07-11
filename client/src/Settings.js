@@ -130,7 +130,7 @@ export default function Settings() {
           <div className="settings-personal-grid">
             {/* Left: Profile Picture */}
             <div className="settings-profile-col">
-              <div className="settings-profile-avatar-wrap">
+              <div className="settings-profile-avatar-wrap" style={{ position: 'relative' }}>
                 <img
                   src={profilePic || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}
                   alt="Profile"
@@ -140,10 +140,31 @@ export default function Settings() {
                     e.target.src = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
                   }}
                 />
-                <label className="settings-profile-upload-overlay">
+                {/* Upload Icon */}
+                <label className="settings-profile-upload-overlay" title="Upload Picture">
                   <FaUser />
                   <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleProfilePicChange} />
                 </label>
+                {/* Remove Icon (only if custom picture is set) */}
+                {profilePic && (
+                  <span
+                    title="Remove Picture"
+                    style={{
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                      background: '#fff',
+                      borderRadius: '50%',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
+                      cursor: 'pointer',
+                      padding: 4,
+                      zIndex: 2
+                    }}
+                    onClick={() => setProfilePic(null)}
+                  >
+                    <FaTrash color="#e57373" size={18} />
+                  </span>
+                )}
               </div>
               <div className="settings-profile-upload-hint">{t('uploadPic')}</div>
             </div>
@@ -261,4 +282,4 @@ export default function Settings() {
       </div>
     </div>
   );
-} 
+}
